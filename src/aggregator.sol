@@ -38,8 +38,8 @@
 
 pragma solidity ^0.4.7;
 
+import "feedbase/interface.sol";
 import "./interface.sol";
-
 
 contract FeedAggregator is FeedAggregatorInterface100
                       , FeedAggregatorEvents100
@@ -56,24 +56,21 @@ contract FeedAggregator is FeedAggregatorInterface100
     }
 
     struct Aggregator {
-        Feed feed1;
-        Feed feed2;
-        Feed feed3;
-    }
-
-    struct Feed {
-        address    contract;
-        bytes12    position;
+        address                 owner;
+        bytes32                 label;
+        FeedbaseInterface200    feed1;
+        bytes12                 position1;
+        FeedbaseInterface200    feed2;
+        bytes12                 position2;
+        FeedbaseInterface200    feed3;
+        bytes12                 position3;
     }
 
     function owner(bytes12 id) constant returns (address) {
-        return feeds[id].owner;
+        return aggregators[id].owner;
     }
     function label(bytes12 id) constant returns (bytes32) {
-        return feeds[id].label;
-    }
-    function timestamp(bytes12 id) constant returns (uint40) {
-        return feeds[id].timestamp;
+        return aggregators[id].label;
     }
 
     //------------------------------------------------------------------
@@ -105,12 +102,8 @@ contract FeedAggregator is FeedAggregatorInterface100
     address contract3, bytes12 position3)
         aggregator_auth(id)
     {
-        aggregators[id].feed1.contract      = contract1;
-        aggregators[id].feed1.position      = position1;
-        aggregators[id].feed2.contract      = contract2;
-        aggregators[id].feed2.position      = position2;
-        aggregators[id].feed3.contract      = contract3;
-        aggregators[id].feed3.position      = position3;
+        aggregators[id].feed1 = FeedbaseInterface200(contract1);
+        aggregators[id].position1 = FeedbaseInterface200(position1);
 
         LogSet(id, contract1, position1, contract2, position2, contract3, position3);
     }
@@ -135,9 +128,9 @@ contract FeedAggregator is FeedAggregatorInterface100
 
     function tryGet(bytes12 id) returns (bytes32 value, bool ok) {
         // get values for 3 feeds
-        var (value1, ok1) = (uint256)FeedbaseInterface(aggregators[id].feed1.contract).tryGet(aggregators[id].feed1.position);
-        var (value2, ok2) = (uint256)FeedbaseInterface(aggregators[id].feed2.contract).tryGet(aggregators[id].feed2.position);
-        var (value3, ok3) = (uint256)FeedbaseInterface(aggregators[id].feed3.contract).tryGet(aggregators[id].feed3.position);
+        var (value1, ok1) = (uint256)FeedbaseInterface(aggregators[id].feed1).tryGet(aggregators[id].position1);
+        var (value2, ok2) = (uint256)FeedbaseInterface(aggregators[id].feed2).tryGet(aggregators[id].position2);
+        var (value3, ok3) = (uint256)FeedbaseInterface(aggregators[id].feed3).tryGet(aggregators[id].position3);
         
         return ((bytes32)((value1 + value2 + value3) / 3), ok1 && ok2 && ok3);
     }

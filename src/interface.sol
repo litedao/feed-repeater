@@ -31,11 +31,3 @@ contract FeedAggregatorInterface100 {
     function get(bytes12 id) returns (bytes32 value);
     function tryGet(bytes12 id) returns (bytes32 value, bool ok);
 }
-
-contract FeedbaseInterface {
-    function claim() returns (bytes12 id);
-    function set(bytes12 id, bytes32 value, uint40 expiration);
-    function has(bytes12 id) returns (bool ok);
-    function get(bytes12 id) returns (bytes32 value);
-    function tryGet(bytes12 id) returns (bytes32 value, bool ok);
-}
