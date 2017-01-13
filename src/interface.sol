@@ -39,4 +39,3 @@ contract FeedbaseInterface {
     function get(bytes12 id) returns (bytes32 value);
     function tryGet(bytes12 id) returns (bytes32 value, bool ok);
 }
-
