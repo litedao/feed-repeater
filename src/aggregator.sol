@@ -41,7 +41,7 @@ pragma solidity ^0.4.7;
 import "feedbase/interface.sol";
 import "./interface.sol";
 
-contract FeedAggregator is FeedAggregatorInterface100
+contract FeedAggregator100 is FeedAggregatorInterface100
                       , FeedAggregatorEvents100
 {
     mapping (bytes12 => Aggregator) aggregators;
@@ -103,7 +103,7 @@ contract FeedAggregator is FeedAggregatorInterface100
         aggregator_auth(id)
     {
         aggregators[id].feed1 = FeedbaseInterface200(contract1);
-        aggregators[id].position1 = FeedbaseInterface200(position1);
+        aggregators[id].position1 = position1;
 
         LogSet(id, contract1, position1, contract2, position2, contract3, position3);
     }
@@ -128,11 +128,11 @@ contract FeedAggregator is FeedAggregatorInterface100
 
     function tryGet(bytes12 id) returns (bytes32 value, bool ok) {
         // get values for 3 feeds
-        var (value1, ok1) = (uint256)FeedbaseInterface(aggregators[id].feed1).tryGet(aggregators[id].position1);
-        var (value2, ok2) = (uint256)FeedbaseInterface(aggregators[id].feed2).tryGet(aggregators[id].position2);
-        var (value3, ok3) = (uint256)FeedbaseInterface(aggregators[id].feed3).tryGet(aggregators[id].position3);
+        var (value1, ok1) = aggregators[id].feed1.tryGet(aggregators[id].position1);
+        var (value2, ok2) = aggregators[id].feed2.tryGet(aggregators[id].position2);
+        var (value3, ok3) = aggregators[id].feed3.tryGet(aggregators[id].position3);
         
-        return ((bytes32)((value1 + value2 + value3) / 3), ok1 && ok2 && ok3);
+        return (bytes32((uint256(value1) + uint256(value2) + uint256(value3)) / 3), ok1 && ok2 && ok3);
     }
 
     function get(bytes12 id) returns (bytes32 value) {

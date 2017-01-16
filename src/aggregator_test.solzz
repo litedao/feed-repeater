@@ -25,20 +25,19 @@ pragma solidity ^0.4.7;
 
 import "dapple/test.sol";
 import "feedbase/feedbase.sol";
-import "./interface.sol";
+import "./aggregator.sol";
 
-contract PaidFeedbaseTest is Test,
-    PaidFeedbaseEvents
+contract FeedAggregatorTest is Test,
+    FeedAggregatorEvents100
 {
-    FakePerson    assistant  = new FakePerson();
-    FakeToken     token      = new FakeToken();
-    PaidFeedbase  feedbase   = new PaidFeedbase();
+    FakePerson      assistant    = new FakePerson();
+    FeedAggregator  aggregator   = new FeedAggregator();
 
     bytes12       id;
 
     function setUp() {
-        assistant._target(feedbase);
-        id = feedbase.claim(token);
+        assistant._target(aggregator);
+        id = aggregator.claim(token);
     }
 
     function time() returns (uint40) {
