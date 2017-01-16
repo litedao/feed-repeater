@@ -1,4 +1,4 @@
-pragma solidity ^0.4.7;
+pragma solidity ^0.4.8;
 
 import "dapple/script.sol";
 import "./aggregator.sol";

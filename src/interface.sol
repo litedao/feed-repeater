@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-pragma solidity ^0.4.7;
+pragma solidity ^0.4.8;
 
 contract FeedAggregatorEvents100 {
     event LogClaim     (bytes12 indexed id, address owner);

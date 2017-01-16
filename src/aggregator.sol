@@ -19,24 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Feedbase.  If not, see <http://www.gnu.org/licenses/>.
 
-/// Commentary:
-
-// One reason why we use `bytes12' for feed IDs is to help prevent
-// accidentally confusing different values of the same integer type:
-// because `bytes12' is an unusual type, it becomes a lot less likely
-// for someone to confuse a feed ID with some other kind of value.
-//
-// (For example, this is very error-prone when dealing with functions
-// that take long lists of various parameters or return many values.)
-//
-// Another reason is simply to avoid wasting storage, and a third is
-// to make the IDs fit in other contexts (such as JavaScript numbers).
-//
-// Finally, for programming convenience, feeds start at 1 (not 0).
-
-/// Code:
-
-pragma solidity ^0.4.7;
+pragma solidity ^0.4.8;
 
 import "feedbase/interface.sol";
 import "./interface.sol";
@@ -104,6 +87,12 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     {
         aggregators[id].feed1 = FeedbaseInterface200(contract1);
         aggregators[id].position1 = position1;
+
+        aggregators[id].feed2 = FeedbaseInterface200(contract2);
+        aggregators[id].position2 = position2;
+
+        aggregators[id].feed3 = FeedbaseInterface200(contract3);
+        aggregators[id].position3 = position3;
 
         LogSet(id, contract1, position1, contract2, position2, contract3, position3);
     }

@@ -14,5 +14,4 @@ name: feed-aggregator
 dapple_version: 0.8.39
 environments:
   develop:
-    objects: {}
     type: TestRPC
