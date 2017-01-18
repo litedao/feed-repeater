@@ -146,20 +146,18 @@ contract FeedAggregator100 is FeedAggregatorInterface100
         var (value2, ok2) = aggregators[id].feed2.tryGet(aggregators[id].position2);
         var (value3, ok3) = aggregators[id].feed3.tryGet(aggregators[id].position3);
         
-        if (!ok1 || !ok2 || !ok3) {
-            return (0, false);
+        if (ok1 && ok2 && ok3) {
+            bytes32 median = 0;
+
+            if (value1 >= value2 && value1 <= value3 || value1 <= value2 && value1 >= value3) {
+                median = value1;
+            } else if (value2 >= value3 && value2 <= value1 || value2 <= value3 && value2 >= value1) {
+                median = value2;
+            }  else if (value3 >= value1 && value3 <= value2 || value3 <= value1 && value3 >= value2) {
+                median = value3;
+            }
+
+            return (median, true);
         }
-
-        bytes32 median = 0;
-
-        if (value1 >= value2 && value1 <= value3 || value1 <= value2 && value1 >= value3) {
-            median = value1;
-        } else if (value2 >= value3 && value2 <= value1 || value2 <= value3 && value2 >= value1) {
-            median = value2;
-        }  else if (value3 >= value1 && value3 <= value2 || value3 <= value1 && value3 >= value2) {
-            median = value3;
-        }
-
-        return (median, true);
     }
 }
