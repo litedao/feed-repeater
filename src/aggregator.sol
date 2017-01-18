@@ -1,17 +1,19 @@
 /// aggregator.sol --- simple feed-oriented data access pattern
 
-// Copyright (C) 2015-2016  Nexus Development <https://nexusdev.us>
-// Copyright (C) 2015-2016  Nikolai Mushegian <nikolai@nexusdev.us>
-// Copyright (C) 2016       Daniel Brockman   <daniel@brockman.se>
+// Copyright (C) 2015-2017  Nexus Development       <https://nexusdev.us>
+// Copyright (C) 2015-2016  Nikolai Mushegian       <nikolai@nexusdev.us>
+// Copyright (C) 2016       Daniel Brockman         <daniel@brockman.se>
+// Copyright (C) 2017       Mariano Conti           <nanexcool@gmail.com>
+// Copyright (C) 2017       Gonzalo Balabasquer     <gbalabasquer@gmail.com>
 
-// This file is part of Feedbase.
+// This file is part of FeedAggregator.
 
-// Feedbase is free software; you can redistribute and/or modify it
+// FeedAgreggator is free software; you can redistribute and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
-// Feedbase is distributed in the hope that it will be useful,
+// FeedAgreggator is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty
 // of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 //
@@ -36,7 +38,7 @@
 
 /// Code:
 
-pragma solidity ^0.4.7;
+pragma solidity ^0.4.8;
 
 import "feedbase/interface.sol";
 import "./interface.sol";
@@ -132,6 +134,12 @@ contract FeedAggregator100 is FeedAggregatorInterface100
         var (value2, ok2) = aggregators[id].feed2.tryGet(aggregators[id].position2);
         var (value3, ok3) = aggregators[id].feed3.tryGet(aggregators[id].position3);
         
+        if(!ok1 || !ok2 || !ok3) {
+            return (, false);
+        }
+
+        
+
         return (bytes32((uint256(value1) + uint256(value2) + uint256(value3)) / 3), ok1 && ok2 && ok3);
     }
 
