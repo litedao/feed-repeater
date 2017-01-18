@@ -19,7 +19,7 @@
 //
 // See the GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
-// along with Feedbase.  If not, see <http://www.gnu.org/licenses/>.
+// along with FeedAggregator.  If not, see <http://www.gnu.org/licenses/>.
 
 /// Commentary:
 
@@ -106,6 +106,12 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     {
         aggregators[id].feed1 = FeedbaseInterface200(contract1);
         aggregators[id].position1 = position1;
+
+        aggregators[id].feed2 = FeedbaseInterface200(contract2);
+        aggregators[id].position2 = position2;
+
+        aggregators[id].feed3 = FeedbaseInterface200(contract3);
+        aggregators[id].position3 = position3;
 
         LogSet(id, contract1, position1, contract2, position2, contract3, position3);
     }

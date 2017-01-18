@@ -1,5 +1,5 @@
 /*
-   Copyright 2016 Nexus Development, LLC
+   Copyright 2017 Nexus Development, LLC
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-pragma solidity ^0.4.7;
+pragma solidity ^0.4.8;
 
 contract FeedAggregatorEvents100 {
     event LogClaim     (bytes12 indexed id, address owner);
