@@ -156,8 +156,32 @@ contract FeedAggregatorTest is Test,
         assertTrue(ok);
     }
 
+    function test_get_all_same_values() {
+        feed1.set(position1, bytes32(10), time() + 1000000);
+        feed2.set(position2, bytes32(10), time() + 1000000);
+        feed3.set(position3, bytes32(10), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(10));
+        assertTrue(ok);
+    }
+
     function test_get_expired() {
         feed1.set(1, 0x1234, 123);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, 0);
+        assertFalse(ok);
+    }
+
+    function testFail_non_existant_feed() {
+        aggregator.set(id, address(0), position1, feed2, position2, feed3, position3);
+
+        var (value, ok) = aggregator.tryGet(id);
+    }
+
+    function test_non_existant_position() {
+        aggregator.set(id, feed1, bytes12(99), feed2, position2, feed3, position3);
 
         var (value, ok) = aggregator.tryGet(id);
         assertEq32(value, 0);
