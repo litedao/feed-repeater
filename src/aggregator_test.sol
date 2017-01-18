@@ -34,22 +34,26 @@ contract FeedAggregatorTest is Test,
 {
     FakePerson      assistant    = new FakePerson();
     FeedAggregator100  aggregator   = new FeedAggregator100();
+
     Feedbase200 feed1 = new Feedbase200();
     Feedbase200 feed2 = new Feedbase200();
     Feedbase200 feed3 = new Feedbase200();
+
     uint256 value1 = 15;
     uint256 value2 = 33;
     uint256 value3 = 71;
 
     bytes12       id;
+    bytes12 position1;
+    bytes12 position2;
+    bytes12 position3;
 
     function setUp() {
         assistant._target(aggregator);
         
-
-        bytes12 position1 = feed1.claim();
-        bytes12 position2 = feed2.claim();
-        bytes12 position3 = feed3.claim();
+        position1 = feed1.claim();
+        position2 = feed2.claim();
+        position3 = feed3.claim();
 
         feed1.set(position1, bytes32(value1), time() + 1000000);
         feed2.set(position2, bytes32(value2), time() + 1000000);
@@ -66,8 +70,20 @@ contract FeedAggregatorTest is Test,
     }
 
     function test_claim() {
+        expectEventsExact(aggregator);
+
         assertEq(uint(id), 1);
+
         assertEq(uint(aggregator.claim()), 2);
+        LogClaim(2, this);
+    }
+
+    function test_set() {
+        expectEventsExact(aggregator);
+
+        aggregator.set(id, feed1, position1, feed2, position2, feed3, position3);
+
+        LogSet(id, feed1, position1, feed2, position2, feed3, position3);
     }
 
     function test_owner() {
@@ -77,6 +93,66 @@ contract FeedAggregatorTest is Test,
     function test_get() {
         var (value, ok) = aggregator.tryGet(id);
         assertEq32(value, bytes32(value2));
+        assertTrue(ok);
+    }
+
+    function test_get_value1() {
+        feed1.set(position1, bytes32(12), time() + 1000000);
+        feed2.set(position2, bytes32(1), time() + 1000000);
+        feed3.set(position3, bytes32(30), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(12));
+        assertTrue(ok);
+    }
+
+    function test_get_value2() {
+        feed1.set(position1, bytes32(34), time() + 1000000);
+        feed2.set(position2, bytes32(120), time() + 1000000);
+        feed3.set(position3, bytes32(9999), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(120));
+        assertTrue(ok);
+    }
+
+    function test_get_value3() {
+        feed1.set(position1, bytes32(9), time() + 1000000);
+        feed2.set(position2, bytes32(25), time() + 1000000);
+        feed3.set(position3, bytes32(10), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(10));
+        assertTrue(ok);
+    }
+
+    function test_get_same_values1() {
+        feed1.set(position1, bytes32(10), time() + 1000000);
+        feed2.set(position2, bytes32(10), time() + 1000000);
+        feed3.set(position3, bytes32(999), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(10));
+        assertTrue(ok);
+    }
+
+    function test_get_same_values2() {
+        feed1.set(position1, bytes32(999), time() + 1000000);
+        feed2.set(position2, bytes32(10), time() + 1000000);
+        feed3.set(position3, bytes32(10), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(10));
+        assertTrue(ok);
+    }
+
+    function test_get_same_values3() {
+        feed1.set(position1, bytes32(10), time() + 1000000);
+        feed2.set(position2, bytes32(999), time() + 1000000);
+        feed3.set(position3, bytes32(10), time() + 1000000);
+
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, bytes32(10));
         assertTrue(ok);
     }
 
