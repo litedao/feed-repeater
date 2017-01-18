@@ -34,6 +34,9 @@ contract FeedAggregatorTest is Test,
 {
     FakePerson      assistant    = new FakePerson();
     FeedAggregator100  aggregator   = new FeedAggregator100();
+    Feedbase200 feed1 = new Feedbase200();
+    Feedbase200 feed2 = new Feedbase200();
+    Feedbase200 feed3 = new Feedbase200();
     uint256 value1 = 15;
     uint256 value2 = 33;
     uint256 value3 = 71;
@@ -42,9 +45,7 @@ contract FeedAggregatorTest is Test,
 
     function setUp() {
         assistant._target(aggregator);
-        Feedbase200 feed1 = new Feedbase200();
-        Feedbase200 feed2 = new Feedbase200();
-        Feedbase200 feed3 = new Feedbase200();
+        
 
         bytes12 position1 = feed1.claim();
         bytes12 position2 = feed2.claim();
@@ -75,150 +76,43 @@ contract FeedAggregatorTest is Test,
 
     function test_get() {
         var (value, ok) = aggregator.tryGet(id);
-        assertEq32(value, bytes32((value1 + value2 + value3) / 3));
+        assertEq32(value, bytes32(value2));
         assertTrue(ok);
     }
 
-    // function test_get() {
-    //     expectEventsExact(aggregator);
+    function test_get_expired() {
+        feed1.set(1, 0x1234, 123);
 
-    //     id = feedbase.claim();
-    //     LogClaim(id, address(this));
+        var (value, ok) = aggregator.tryGet(id);
+        assertEq32(value, 0);
+        assertFalse(ok);
+    }
 
-    //     feedbase.set(id, 0x1234, time() + 1);
-    //     LogSet(id, 0x1234, time() + 1);
+    function test_set_owner() {
+        expectEventsExact(aggregator);
 
-    //     var (value, ok) = assistant.tryGet(id);
-    //     assertEq32(value, 0x1234);
-    //     assertTrue(ok);
-    // }
+        aggregator.set_owner(id, assistant);
+        LogSetOwner(id, assistant);
 
-    // function test_get_expired() {
-    //     expectEventsExact(feedbase);
+        assertEq(aggregator.owner(id), assistant);
+    }
 
-    //     feedbase.set(id, 0x1234, 123);
-    //     LogSet(id, 0x1234, 123);
+    function testFail_set_owner_unauth() {
+        Feedbase200(assistant).set_owner(id, assistant);
+    }
 
-    //     var (value, ok) = feedbase.tryGet(id);
-    //     assertEq32(value, 0);
-    //     assertFalse(ok);
-    // }
+    function test_set_label() {
+        expectEventsExact(aggregator);
 
-    // function test_payment() {
-    //     expectEventsExact(feedbase);
+        aggregator.set_label(id, "foo");
+        LogSetLabel(id, "foo");
 
-    //     feedbase.set_price(id, 50);
-    //     LogSetPrice(id, 50);
+        assertEq32(aggregator.label(id), "foo");
+    }
 
-    //     feedbase.set(id, 0x1234, time() + 1);
-    //     LogSet(id, 0x1234, time() + 1);
-
-    //     token.set_balance(assistant, 2000);
-
-    //     var (value, ok) = assistant.tryGet(id);
-    //     LogPay(id, assistant);
-    //     assertEq32(value, 0x1234);
-    //     assertTrue(ok);
-
-    //     assertEq(token.balances(assistant), 1950);
-    // }
-
-    // function test_already_paid() {
-    //     expectEventsExact(feedbase);
-
-    //     feedbase.set_price(id, 50);
-    //     LogSetPrice(id, 50);
-
-    //     feedbase.set(id, 0x1234, time() + 1);
-    //     LogSet(id, 0x1234, time() + 1);
-
-    //     token.set_balance(assistant, 2000);
-
-    //     var (value_1, ok_1) = assistant.tryGet(id);
-    //     LogPay(id, assistant);
-    //     assertEq32(value_1, 0x1234);
-    //     assertTrue(ok_1);
-
-    //     var (value_2, ok_2) = assistant.tryGet(id);
-    //     assertEq32(value_2, 0x1234);
-    //     assertTrue(ok_2);
-
-    //     assertEq(token.balances(assistant), 1950);
-    // }
-
-    // function test_failed_payment_throwing_token() {
-    //     expectEventsExact(feedbase);
-
-    //     feedbase.set_price(id, 50);
-    //     LogSetPrice(id, 50);
-
-    //     feedbase.set(id, 0x1234, time() + 1);
-    //     LogSet(id, 0x1234, time() + 1);
-
-    //     token.set_balance(assistant, 49);
-
-    //     var (value, ok) = assistant.tryGet(id);
-    //     assertEq32(value, 0);
-    //     assertFalse(ok);
-
-    //     assertEq(token.balances(assistant), 49);
-    // }
-
-    // function test_failed_payment_nonthrowing_token() {
-    //     expectEventsExact(feedbase);
-
-    //     feedbase.set_price(id, 50);
-    //     LogSetPrice(id, 50);
-
-    //     feedbase.set(id, 0x1234, time() + 1);
-    //     LogSet(id, 0x1234, time() + 1);
-
-    //     token.set_balance(assistant, 49);
-    //     token.disable_throwing();
-
-    //     var (value, ok) = assistant.tryGet(id);
-    //     assertEq32(value, 0);
-    //     assertFalse(ok);
-
-    //     assertEq(token.balances(assistant), 49);
-    // }
-
-    // function testFail_set_price_without_token() {
-    //     feedbase.set_price(feedbase.claim(), 50);
-    // }
-
-    // function testFail_set_price_unauth() {
-    //     PaidFeedbase(assistant).set_price(id, 50);
-    // }
-
-    // function test_set_owner() {
-    //     expectEventsExact(feedbase);
-
-    //     feedbase.set_owner(id, assistant);
-    //     LogSetOwner(id, assistant);
-
-    //     PaidFeedbase(assistant).set_price(id, 50);
-    //     LogSetPrice(id, 50);
-
-    //     assertEq(feedbase.price(id), 50);
-    // }
-
-    // function testFail_set_owner_unauth() {
-    //     Feedbase200(assistant).set_owner(id, assistant);
-    // }
-
-    // function test_set_label() {
-    //     expectEventsExact(feedbase);
-
-    //     feedbase.set_label(id, "foo");
-    //     LogSetLabel(id, "foo");
-
-    //     assertEq32(feedbase.label(id), "foo");
-    // }
-
-    // function testFail_set_label_unauth() {
-    //     Feedbase200(assistant).set_label(id, "foo");
-    // }
+    function testFail_set_label_unauth() {
+        Feedbase200(assistant).set_label(id, "foo");
+    }
 }
 
 contract FakePerson is Tester {

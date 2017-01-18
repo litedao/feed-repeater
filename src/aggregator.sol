@@ -134,25 +134,32 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     // Reading aggregators
     //------------------------------------------------------------------
 
-    function tryGet(bytes12 id) returns (bytes32 value, bool ok) {
-        // get values for 3 feeds
-        var (value1, ok1) = aggregators[id].feed1.tryGet(aggregators[id].position1);
-        var (value2, ok2) = aggregators[id].feed2.tryGet(aggregators[id].position2);
-        var (value3, ok3) = aggregators[id].feed3.tryGet(aggregators[id].position3);
-        
-        if(!ok1 || !ok2 || !ok3) {
-            return (, false);
-        }
-
-        
-
-        return (bytes32((uint256(value1) + uint256(value2) + uint256(value3)) / 3), ok1 && ok2 && ok3);
-    }
-
     function get(bytes12 id) returns (bytes32 value) {
         var (val, ok) = tryGet(id);
         if(!ok) throw;
         return val;
     }
 
+    function tryGet(bytes12 id) returns (bytes32 value, bool ok) {
+        // get values for 3 feeds
+        var (value1, ok1) = aggregators[id].feed1.tryGet(aggregators[id].position1);
+        var (value2, ok2) = aggregators[id].feed2.tryGet(aggregators[id].position2);
+        var (value3, ok3) = aggregators[id].feed3.tryGet(aggregators[id].position3);
+        
+        if (!ok1 || !ok2 || !ok3) {
+            return (0, false);
+        }
+
+        bytes32 median = 0;
+
+        if (value1 >= value2 && value1 <= value3 || value1 <= value2 && value1 >= value3) {
+            median = value1;
+        } else if (value2 >= value3 && value2 <= value1 || value2 <= value3 && value2 >= value1) {
+            median = value2;
+        }  else if (value3 >= value1 && value3 <= value2 || value3 <= value1 && value3 >= value2) {
+            median = value3;
+        }
+
+        return (median, true);
+    }
 }
