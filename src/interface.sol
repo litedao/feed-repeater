@@ -16,19 +16,17 @@
 
 pragma solidity ^0.4.8;
 
-import "feedbase/interface.sol";
-
 contract FeedAggregatorEvents100 {
     event LogClaim     (bytes12 indexed id, address owner);
-    event LogSet       (bytes12 aggregatorId, bytes12 feedId, FeedbaseInterface200 feedbase, bytes12 position);
+    event LogSet       (bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
     event LogSetOwner  (bytes12 indexed id, address owner);
     event LogSetLabel  (bytes12 indexed id, bytes32 label);
 }
 
 contract FeedAggregatorInterface100 {
     function claim(bytes12 minimumValid) returns (bytes12 id);
-    function add(bytes12 aggregatorId, FeedbaseInterface200 feedbase, bytes12 position);
-    function set(bytes12 aggregatorId, bytes12 feedId, FeedbaseInterface200 feedbase, bytes12 position);
+    function add(bytes12 aggregatorId, address feedbase, bytes12 position);
+    function set(bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
     function get(bytes12 id) returns (bytes32 value);
     function tryGet(bytes12 id) returns (bytes32 value, bool ok);
 }

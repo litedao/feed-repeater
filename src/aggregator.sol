@@ -41,6 +41,7 @@
 pragma solidity ^0.4.8;
 
 import "./interface.sol";
+import "feedbase/interface.sol";
 
 contract FeedAggregator100 is FeedAggregatorInterface100
                       , FeedAggregatorEvents100
@@ -65,7 +66,7 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     }
 
     struct Feed {
-        FeedbaseInterface200    feedbase;
+        address    feedbase;
         bytes12                 position;
     }
 
@@ -103,7 +104,7 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     // Updating aggregators
     //------------------------------------------------------------------
 
-    function add(bytes12 aggregatorId, FeedbaseInterface200 feedbase, bytes12 position)
+    function add(bytes12 aggregatorId, address feedbase, bytes12 position)
          aggregator_auth(aggregatorId)
     {
         bytes12 feedId = aggregators[aggregatorId].next;
@@ -114,7 +115,7 @@ contract FeedAggregator100 is FeedAggregatorInterface100
         set(aggregatorId, feedId, feedbase, position);
     }
 
-    function set(bytes12 aggregatorId, bytes12 feedId, FeedbaseInterface200 feedbase, bytes12 position)
+    function set(bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position)
          aggregator_auth(aggregatorId)
     {
         aggregators[aggregatorId].feeds[feedId].feedbase = feedbase;
@@ -151,8 +152,9 @@ contract FeedAggregator100 is FeedAggregatorInterface100
         if (uint(aggregators[aggregatorId].next) > 1 && uint(aggregators[aggregatorId].next) > uint(aggregators[aggregatorId].minimumValid)) {
             mapping (uint => bytes32) values;
             uint next = 0;
-            for (uint i = 1; i <= uint(aggregators[aggregatorId].next); i++) {
-                (value, ok) = aggregators[aggregatorId].feeds[bytes12(i)].feedbase.tryGet(aggregators[aggregatorId].feeds[bytes12(i)].position);
+           
+            for (uint i = 1; i < uint(aggregators[aggregatorId].next); i++) {
+                (value, ok) = FeedbaseInterface200(aggregators[aggregatorId].feeds[bytes12(i)].feedbase).tryGet(aggregators[aggregatorId].feeds[bytes12(i)].position);
 
                 if(ok) {
                     if (next == 0 || value > values[next - 1]) {

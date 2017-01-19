@@ -90,19 +90,19 @@ contract FeedAggregatorTest is Test,
 
     function test_try_get() {
         bytes12 id1 = feedbase1.claim();
-        feedbase1.set(id1, bytes32(11), time() + 10000);
+        feedbase1.set(id1, 11, time() + 10000);
         
         bytes12 id2 = feedbase2.claim();
-        feedbase2.set(id2, bytes32(5), time() + 10000);
+        feedbase2.set(id2, 5, time() + 10000);
         
         bytes12 id3 = feedbase3.claim();
-        feedbase3.set(id3, bytes32(10), time() + 10000);
+        feedbase3.set(id3, 10, time() + 10000);
 
         bytes12 id4 = feedbase1.claim();
-        feedbase1.set(id4, bytes32(16), time() + 10000);
+        feedbase1.set(id4, 16, time() + 10000);
 
         bytes12 id5 = feedbase2.claim();
-        feedbase2.set(id5, bytes32(18), time() + 10000);
+        feedbase2.set(id5, 18, time() + 10000);
 
         aggregator.add(id, feedbase1, id1);
         aggregator.add(id, feedbase2, id2);
