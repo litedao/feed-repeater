@@ -39,10 +39,11 @@ contract FeedAggregatorTest is Test,
     Feedbase200         feedbase3   = new Feedbase200();
     
     bytes12 id;
+    bytes12 constant INITIAL_MINIMUM_VALID = 3;
 
     function setUp() {
         assistant._target(aggregator);
-        id = aggregator.claim(3);
+        id = aggregator.claim(INITIAL_MINIMUM_VALID);
     }
 
     function time() returns (uint40) {
@@ -55,6 +56,7 @@ contract FeedAggregatorTest is Test,
         assertEq(uint(id), 1);
 
         assertEq(uint(aggregator.claim(1)), 2);
+
         LogClaim(2, this);
         LogMinimumValid(2, 1);
     }
@@ -91,19 +93,19 @@ contract FeedAggregatorTest is Test,
 
     function test_try_get() {
         bytes12 id1 = feedbase1.claim();
-        feedbase1.set(id1, 11, time() + 10000);
+        feedbase1.set(id1, 11);
         
         bytes12 id2 = feedbase2.claim();
-        feedbase2.set(id2, 5, time() + 10000);
+        feedbase2.set(id2, 5);
         
         bytes12 id3 = feedbase3.claim();
-        feedbase3.set(id3, 10, time() + 10000);
+        feedbase3.set(id3, 10);
 
         bytes12 id4 = feedbase1.claim();
-        feedbase1.set(id4, 16, time() + 10000);
+        feedbase1.set(id4, 16);
 
         bytes12 id5 = feedbase2.claim();
-        feedbase2.set(id5, 18, time() + 10000);
+        feedbase2.set(id5, 18);
 
         aggregator.add(id, feedbase1, id1);
         aggregator.add(id, feedbase2, id2);
@@ -113,9 +115,69 @@ contract FeedAggregatorTest is Test,
 
         var (value, ok) = aggregator.tryGet(id);
 
-        assertEq32(value, bytes32(11));
+        assertEq32(value, 11);
         assertTrue(ok);
-    }    
+    }
+
+    function test_try_get_with_two_expired() {
+        bytes12 newId = aggregator.claim(3);
+
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 11, 0); // expired
+        
+        bytes12 id2 = feedbase2.claim();
+        feedbase2.set(id2, 5);
+        
+        bytes12 id3 = feedbase3.claim();
+        feedbase3.set(id3, 10);
+
+        bytes12 id4 = feedbase1.claim();
+        feedbase1.set(id4, 16, 0); // expired
+
+        bytes12 id5 = feedbase2.claim();
+        feedbase2.set(id5, 18);
+
+        aggregator.add(newId, feedbase1, id1);
+        aggregator.add(newId, feedbase2, id2);
+        aggregator.add(newId, feedbase3, id3);
+        aggregator.add(newId, feedbase1, id4);
+        aggregator.add(newId, feedbase2, id5);
+
+        var (value, ok) = aggregator.tryGet(newId);
+
+        assertEq32(value, 10);
+        assertTrue(ok);
+    }
+
+    function test_try_get_with_three_expired() {
+        bytes12 newId = aggregator.claim(3);
+
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 11, 0);  // expired
+        
+        bytes12 id2 = feedbase2.claim();
+        feedbase2.set(id2, 5, 0);  // expired
+        
+        bytes12 id3 = feedbase3.claim();
+        feedbase3.set(id3, 10);
+
+        bytes12 id4 = feedbase1.claim();
+        feedbase1.set(id4, 16, 0);  // expired
+
+        bytes12 id5 = feedbase2.claim();
+        feedbase2.set(id5, 18);
+
+        aggregator.add(newId, feedbase1, id1);
+        aggregator.add(newId, feedbase2, id2);
+        aggregator.add(newId, feedbase3, id3);
+        aggregator.add(newId, feedbase1, id4);
+        aggregator.add(newId, feedbase2, id5);
+
+        var (value, ok) = aggregator.tryGet(newId);
+
+        assertEq32(value, 0);
+        assertFalse(ok);
+    }
 }
 
 contract FakePerson is Tester {

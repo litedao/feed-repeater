@@ -156,7 +156,9 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     }
 
     function tryGet(bytes12 aggregatorId) returns (bytes32 value, bool ok) {
-        if (uint(aggregators[aggregatorId].next) > 1 && uint(aggregators[aggregatorId].next) > uint(aggregators[aggregatorId].minimumValid)) {
+        uint minimumValid = uint(aggregators[aggregatorId].minimumValid);
+        
+        if (uint(aggregators[aggregatorId].next) > 1 && uint(aggregators[aggregatorId].next) > minimumValid) {
             mapping (uint => bytes32) values;
             uint next = 0;
            
@@ -180,9 +182,10 @@ contract FeedAggregator100 is FeedAggregatorInterface100
                 }
             }
 
-            if (next > 0 && next >= uint(aggregators[aggregatorId].minimumValid)) {
+            if (next > 0 && next >= minimumValid) {
                 return (values[next / 2], true);
             }
+            return (0, false);
         }
     }
 }
