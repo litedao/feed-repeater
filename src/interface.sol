@@ -17,14 +17,16 @@
 pragma solidity ^0.4.8;
 
 contract FeedAggregatorEvents100 {
-    event LogClaim     (bytes12 indexed id, address owner);
-    event LogSet       (bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
-    event LogSetOwner  (bytes12 indexed id, address owner);
-    event LogSetLabel  (bytes12 indexed id, bytes32 label);
+    event LogClaim     (bytes12 indexed aggregatorId, address owner);
+    event LogSet       (bytes12 indexed aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
+    event LogSetOwner  (bytes12 indexed aggregatorId, address owner);
+    event LogSetLabel  (bytes12 indexed aggregatorId, bytes32 label);
+    event LogMinimumValid (bytes12 indexed aggregatorId, bytes12 minimumValid);
 }
 
 contract FeedAggregatorInterface100 {
     function claim(bytes12 minimumValid) returns (bytes12 id);
+    function setMinimumValid(bytes12 aggregatorId, bytes12 minimumValid);
     function add(bytes12 aggregatorId, address feedbase, bytes12 position);
     function set(bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
     function get(bytes12 id) returns (bytes32 value);

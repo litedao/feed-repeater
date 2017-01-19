@@ -56,6 +56,7 @@ contract FeedAggregatorTest is Test,
 
         assertEq(uint(aggregator.claim(1)), 2);
         LogClaim(2, this);
+        LogMinimumValid(2, 1);
     }
 
     function test_is_owner() {

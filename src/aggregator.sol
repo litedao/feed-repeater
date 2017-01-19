@@ -81,18 +81,20 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     // Creating aggregators
     //------------------------------------------------------------------
 
-    function claim(bytes12 minimumValid) returns (bytes12 id) {
-        id = next;
-        assert(id != 0x0);
+    function claim(bytes12 minimumValid) returns (bytes12 aggregatorId) {
+        aggregatorId = next;
+        assert(aggregatorId != 0x0);
 
         next = bytes12(uint96(next)+1);
 
-        aggregators[id].owner = msg.sender;
-        aggregators[id].next = 0x1;
-        aggregators[id].minimumValid = minimumValid;
+        aggregators[aggregatorId].owner = msg.sender;
+        aggregators[aggregatorId].next = 0x1;
 
-        LogClaim(id, msg.sender);
-        return id;
+        LogClaim(aggregatorId, msg.sender);
+
+        setMinimumValid(aggregatorId, minimumValid);
+
+        return aggregatorId;
     }
 
     modifier aggregator_auth(bytes12 id) {
@@ -103,6 +105,11 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     //------------------------------------------------------------------
     // Updating aggregators
     //------------------------------------------------------------------
+
+    function setMinimumValid(bytes12 aggregatorId, bytes12 minimumValid) {
+        aggregators[aggregatorId].minimumValid = minimumValid;
+        LogMinimumValid(aggregatorId, minimumValid);
+    }
 
     function add(bytes12 aggregatorId, address feedbase, bytes12 position)
          aggregator_auth(aggregatorId)
