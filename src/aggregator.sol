@@ -40,7 +40,6 @@
 
 pragma solidity ^0.4.8;
 
-import "feedbase/interface.sol";
 import "./interface.sol";
 
 contract FeedAggregator100 is FeedAggregatorInterface100
@@ -58,14 +57,16 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     }
 
     struct Aggregator {
-        address                 owner;
-        bytes32                 label;
-        FeedbaseInterface200    feed1;
-        bytes12                 position1;
-        FeedbaseInterface200    feed2;
-        bytes12                 position2;
-        FeedbaseInterface200    feed3;
-        bytes12                 position3;
+        address                     owner;
+        bytes32                     label;
+        bytes12                     minimumValid;
+        bytes12                     next;
+        mapping (bytes12 => Feed)   feeds;
+    }
+
+    struct Feed {
+        FeedbaseInterface200    feedbase;
+        bytes12                 position;
     }
 
     function owner(bytes12 id) constant returns (address) {
@@ -79,13 +80,15 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     // Creating aggregators
     //------------------------------------------------------------------
 
-    function claim() returns (bytes12 id) {
+    function claim(bytes12 minimumValid) returns (bytes12 id) {
         id = next;
         assert(id != 0x0);
 
         next = bytes12(uint96(next)+1);
 
         aggregators[id].owner = msg.sender;
+        aggregators[id].next = 0x1;
+        aggregators[id].minimumValid = minimumValid;
 
         LogClaim(id, msg.sender);
         return id;
@@ -100,64 +103,77 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     // Updating aggregators
     //------------------------------------------------------------------
 
-    function set(bytes12 id, address contract1, bytes12 position1, address contract2, bytes12 position2,
-    address contract3, bytes12 position3)
-        aggregator_auth(id)
+    function add(bytes12 aggregatorId, FeedbaseInterface200 feedbase, bytes12 position)
+         aggregator_auth(aggregatorId)
     {
-        aggregators[id].feed1 = FeedbaseInterface200(contract1);
-        aggregators[id].position1 = position1;
+        bytes12 feedId = aggregators[aggregatorId].next;
+        assert(feedId != 0x0);
 
-        aggregators[id].feed2 = FeedbaseInterface200(contract2);
-        aggregators[id].position2 = position2;
+        aggregators[aggregatorId].next = bytes12(uint96(feedId)+1);
 
-        aggregators[id].feed3 = FeedbaseInterface200(contract3);
-        aggregators[id].position3 = position3;
-
-        LogSet(id, contract1, position1, contract2, position2, contract3, position3);
+        set(aggregatorId, feedId, feedbase, position);
     }
 
-    function set_owner(bytes12 id, address owner)
-        aggregator_auth(id)
+    function set(bytes12 aggregatorId, bytes12 feedId, FeedbaseInterface200 feedbase, bytes12 position)
+         aggregator_auth(aggregatorId)
     {
-        aggregators[id].owner = owner;
-        LogSetOwner(id, owner);
+        aggregators[aggregatorId].feeds[feedId].feedbase = feedbase;
+        aggregators[aggregatorId].feeds[feedId].position = position;
+
+        LogSet(aggregatorId, feedId, feedbase, position);
     }
 
-    function set_label(bytes12 id, bytes32 label)
-        aggregator_auth(id)
+    function set_owner(bytes12 aggregatorId, address owner)
+        aggregator_auth(aggregatorId)
     {
-        aggregators[id].label = label;
-        LogSetLabel(id, label);
+        aggregators[aggregatorId].owner = owner;
+        LogSetOwner(aggregatorId, owner);
+    }
+
+    function set_label(bytes12 aggregatorId, bytes32 label)
+        aggregator_auth(aggregatorId)
+    {
+        aggregators[aggregatorId].label = label;
+        LogSetLabel(aggregatorId, label);
     }
 
     //------------------------------------------------------------------
     // Reading aggregators
     //------------------------------------------------------------------
 
-    function get(bytes12 id) returns (bytes32 value) {
-        var (val, ok) = tryGet(id);
+    function get(bytes12 aggregatorId) returns (bytes32 value) {
+        var (val, ok) = tryGet(aggregatorId);
         if(!ok) throw;
         return val;
     }
 
-    function tryGet(bytes12 id) returns (bytes32 value, bool ok) {
-        // get values for 3 feeds
-        var (value1, ok1) = aggregators[id].feed1.tryGet(aggregators[id].position1);
-        var (value2, ok2) = aggregators[id].feed2.tryGet(aggregators[id].position2);
-        var (value3, ok3) = aggregators[id].feed3.tryGet(aggregators[id].position3);
-        
-        if (ok1 && ok2 && ok3) {
-            bytes32 median = 0;
+    function tryGet(bytes12 aggregatorId) returns (bytes32 value, bool ok) {
+        if (uint(aggregators[aggregatorId].next) > 1 && uint(aggregators[aggregatorId].next) > uint(aggregators[aggregatorId].minimumValid)) {
+            mapping (uint => bytes32) values;
+            uint next = 0;
+            for (uint i = 1; i <= uint(aggregators[aggregatorId].next); i++) {
+                (value, ok) = aggregators[aggregatorId].feeds[bytes12(i)].feedbase.tryGet(aggregators[aggregatorId].feeds[bytes12(i)].position);
 
-            if (value1 >= value2 && value1 <= value3 || value1 <= value2 && value1 >= value3) {
-                median = value1;
-            } else if (value2 >= value3 && value2 <= value1 || value2 <= value3 && value2 >= value1) {
-                median = value2;
-            }  else if (value3 >= value1 && value3 <= value2 || value3 <= value1 && value3 >= value2) {
-                median = value3;
+                if(ok) {
+                    if (next == 0 || value > values[next - 1]) {
+                        values[next] = value;
+                    } else {
+                        uint j = 0;
+                        while (value >= values[j]) {
+                            j++;
+                        }
+                        for (uint k = uint(next); k > j; k--) {
+                            values[k] = values[k - 1];
+                        }
+                        values[j] = value;
+                    }
+                    next = next + 1;
+                }
             }
 
-            return (median, true);
+            if (next > 0 && next >= uint(aggregators[aggregatorId].minimumValid)) {
+                return (values[next / 2], true);
+            }
         }
     }
 }
