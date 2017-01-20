@@ -133,6 +133,16 @@ contract FeedAggregator100 is FeedAggregatorInterface100
         LogSet(aggregatorId, feedId, feedbase, position);
     }
 
+    function unset(bytes12 aggregatorId, bytes12 feedId)
+         aggregator_auth(aggregatorId)
+    {
+        for (uint i = uint(feedId); i < uint(aggregators[aggregatorId].next); i++) {
+            aggregators[aggregatorId].feeds[bytes12(i)] = aggregators[aggregatorId].feeds[bytes12(i+1)];
+        }
+        aggregators[aggregatorId].next = bytes12(uint96(aggregators[aggregatorId].next)-1);
+        LogUnset(aggregatorId, feedId);
+    }
+
     function set_owner(bytes12 aggregatorId, address owner)
         aggregator_auth(aggregatorId)
     {
