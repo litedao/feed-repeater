@@ -61,6 +61,17 @@ contract FeedAggregatorTest is Test,
         LogMinimumValid(2, 1);
     }
 
+    function test_claim_with_no_minimum() {
+        expectEventsExact(aggregator);
+
+        assertEq(uint(id), 1);
+
+        assertEq(uint(aggregator.claim()), 2);
+
+        LogClaim(2, this);
+        LogMinimumValid(2, 1);
+    }
+
     function test_is_owner() {
         assertEq(aggregator.owner(id), this);
     }

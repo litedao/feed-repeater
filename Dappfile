@@ -14,4 +14,12 @@ name: feed-aggregator
 dapple_version: 0.8.39
 environments:
   develop:
-    type: TestRPC
+    objects: {}
+    type: internal
+  ropsten:
+    objects:
+      aggregator:
+        value: '0x2f4e8647f14092dcd11e0fb0240bbffa518b3ff5'
+        type: >-
+          FeedAggregator100[ccefeaae3b5721ca362db22b87ec6eeee3354c7893e832e07812bd3b1861da1d]
+    type: ropsten

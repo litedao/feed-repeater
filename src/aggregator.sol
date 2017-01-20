@@ -76,10 +76,17 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     function label(bytes12 id) constant returns (bytes32) {
         return aggregators[id].label;
     }
+    function minimumValid(bytes12 id) constant returns (bytes12) {
+        return aggregators[id].minimumValid;
+    }
 
     //------------------------------------------------------------------
     // Creating aggregators
     //------------------------------------------------------------------
+
+    function claim() returns (bytes12 aggregatorId) {
+        return claim(1);
+    }
 
     function claim(bytes12 minimumValid) returns (bytes12 aggregatorId) {
         aggregatorId = next;
