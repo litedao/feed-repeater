@@ -115,13 +115,15 @@ contract FeedAggregator100 is FeedAggregatorInterface100
 
     function set(bytes12 aggregatorId, address feedbase, bytes12 position)
          aggregator_auth(aggregatorId)
+         returns (bytes12 feedId)
     {
-        bytes12 feedId = aggregators[aggregatorId].next;
+        feedId = aggregators[aggregatorId].next;
         assert(feedId != 0x0);
 
         aggregators[aggregatorId].next = bytes12(uint96(feedId)+1);
 
         set(aggregatorId, feedId, feedbase, position);
+        return feedId;
     }
 
     function set(bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position)

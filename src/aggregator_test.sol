@@ -189,6 +189,43 @@ contract FeedAggregatorTest is Test,
         assertEq32(value, 0);
         assertFalse(ok);
     }
+
+    function test_unset() {
+        bytes12 newId = aggregator.claim(3);
+
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 11);
+
+        bytes12 id2 = feedbase2.claim();
+        feedbase2.set(id2, 5);
+
+        bytes12 id3 = feedbase3.claim();
+        feedbase3.set(id3, 10);
+
+        bytes12 id4 = feedbase1.claim();
+        feedbase1.set(id4, 16);
+
+        bytes12 id5 = feedbase2.claim();
+        feedbase2.set(id5, 18);
+
+        bytes12 feedId1 = aggregator.set(newId, feedbase1, id1);
+        bytes12 feedId2 = aggregator.set(newId, feedbase2, id2);
+        bytes12 feedId3 = aggregator.set(newId, feedbase3, id3);
+        bytes12 feedId4 = aggregator.set(newId, feedbase1, id4);
+        bytes12 feedId5 = aggregator.set(newId, feedbase2, id5);
+
+        var (value, ok) = aggregator.tryGet(newId);
+
+        assertEq32(value, 11);
+        assertTrue(ok);
+
+        aggregator.unset(newId, feedId1);
+        aggregator.unset(newId, feedId2);
+
+        (value, ok) = aggregator.tryGet(newId);
+        assertEq32(value, 16);
+        assertTrue(ok);
+    }
 }
 
 contract FakePerson is Tester {
