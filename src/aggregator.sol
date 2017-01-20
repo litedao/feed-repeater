@@ -99,7 +99,7 @@ contract FeedAggregator100 is FeedAggregatorInterface100
 
         LogClaim(aggregatorId, msg.sender);
 
-        setMinimumValid(aggregatorId, minimumValid);
+        set_minimumValid(aggregatorId, minimumValid);
 
         return aggregatorId;
     }
@@ -113,12 +113,7 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     // Updating aggregators
     //------------------------------------------------------------------
 
-    function setMinimumValid(bytes12 aggregatorId, bytes12 minimumValid) {
-        aggregators[aggregatorId].minimumValid = minimumValid;
-        LogMinimumValid(aggregatorId, minimumValid);
-    }
-
-    function add(bytes12 aggregatorId, address feedbase, bytes12 position)
+    function set(bytes12 aggregatorId, address feedbase, bytes12 position)
          aggregator_auth(aggregatorId)
     {
         bytes12 feedId = aggregators[aggregatorId].next;
@@ -150,6 +145,13 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     {
         aggregators[aggregatorId].label = label;
         LogSetLabel(aggregatorId, label);
+    }
+
+    function set_minimumValid(bytes12 aggregatorId, bytes12 minimumValid) 
+        aggregator_auth(aggregatorId)
+    {
+        aggregators[aggregatorId].minimumValid = minimumValid;
+        LogMinimumValid(aggregatorId, minimumValid);
     }
 
     //------------------------------------------------------------------

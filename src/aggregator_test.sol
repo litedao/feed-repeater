@@ -118,11 +118,11 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        aggregator.add(id, feedbase1, id1);
-        aggregator.add(id, feedbase2, id2);
-        aggregator.add(id, feedbase3, id3);
-        aggregator.add(id, feedbase1, id4);
-        aggregator.add(id, feedbase2, id5);
+        aggregator.set(id, feedbase1, id1);
+        aggregator.set(id, feedbase2, id2);
+        aggregator.set(id, feedbase3, id3);
+        aggregator.set(id, feedbase1, id4);
+        aggregator.set(id, feedbase2, id5);
 
         var (value, ok) = aggregator.tryGet(id);
 
@@ -148,11 +148,11 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        aggregator.add(newId, feedbase1, id1);
-        aggregator.add(newId, feedbase2, id2);
-        aggregator.add(newId, feedbase3, id3);
-        aggregator.add(newId, feedbase1, id4);
-        aggregator.add(newId, feedbase2, id5);
+        aggregator.set(newId, feedbase1, id1);
+        aggregator.set(newId, feedbase2, id2);
+        aggregator.set(newId, feedbase3, id3);
+        aggregator.set(newId, feedbase1, id4);
+        aggregator.set(newId, feedbase2, id5);
 
         var (value, ok) = aggregator.tryGet(newId);
 
@@ -178,11 +178,11 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        aggregator.add(newId, feedbase1, id1);
-        aggregator.add(newId, feedbase2, id2);
-        aggregator.add(newId, feedbase3, id3);
-        aggregator.add(newId, feedbase1, id4);
-        aggregator.add(newId, feedbase2, id5);
+        aggregator.set(newId, feedbase1, id1);
+        aggregator.set(newId, feedbase2, id2);
+        aggregator.set(newId, feedbase3, id3);
+        aggregator.set(newId, feedbase1, id4);
+        aggregator.set(newId, feedbase2, id5);
 
         var (value, ok) = aggregator.tryGet(newId);
 

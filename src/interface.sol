@@ -25,9 +25,10 @@ contract FeedAggregatorEvents100 {
 }
 
 contract FeedAggregatorInterface100 {
+    function claim() returns (bytes12 id);
     function claim(bytes12 minimumValid) returns (bytes12 id);
-    function setMinimumValid(bytes12 aggregatorId, bytes12 minimumValid);
-    function add(bytes12 aggregatorId, address feedbase, bytes12 position);
+    function set_minimumValid(bytes12 aggregatorId, bytes12 minimumValid);
+    function set(bytes12 aggregatorId, address feedbase, bytes12 position);
     function set(bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
     function get(bytes12 id) returns (bytes32 value);
     function tryGet(bytes12 id) returns (bytes32 value, bool ok);
