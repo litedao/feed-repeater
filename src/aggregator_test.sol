@@ -225,6 +225,10 @@ contract FeedAggregatorTest is Test,
         (value, ok) = aggregator.tryGet(newId);
         assertEq32(value, 16);
         assertTrue(ok);
+
+        aggregator.set(newId, feedbase2, id2);
+        (value, ok) = aggregator.tryGet(newId);
+        assertEq32(value, 10);
     }
 }
 

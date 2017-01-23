@@ -138,10 +138,9 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     function unset(bytes12 aggregatorId, bytes12 feedId)
          aggregator_auth(aggregatorId)
     {
-        for (uint i = uint(feedId); i < uint(aggregators[aggregatorId].next); i++) {
-            aggregators[aggregatorId].feeds[bytes12(i)] = aggregators[aggregatorId].feeds[bytes12(i+1)];
-        }
-        aggregators[aggregatorId].next = bytes12(uint96(aggregators[aggregatorId].next)-1);
+        aggregators[aggregatorId].feeds[feedId].feedbase = address(0);
+        aggregators[aggregatorId].feeds[feedId].position = 0;
+
         LogUnset(aggregatorId, feedId);
     }
 
@@ -184,27 +183,29 @@ contract FeedAggregator100 is FeedAggregatorInterface100
             uint next = 0;
            
             for (uint i = 1; i < uint(aggregators[aggregatorId].next); i++) {
-                (value, ok) = FeedbaseInterface200(aggregators[aggregatorId].feeds[bytes12(i)].feedbase).tryGet(aggregators[aggregatorId].feeds[bytes12(i)].position);
+                if (aggregators[aggregatorId].feeds[bytes12(i)].feedbase != 0) {
+                    (value, ok) = FeedbaseInterface200(aggregators[aggregatorId].feeds[bytes12(i)].feedbase).tryGet(aggregators[aggregatorId].feeds[bytes12(i)].position);
 
-                if(ok) {
-                    if (next == 0 || value > values[next - 1]) {
-                        values[next] = value;
-                    } else {
-                        uint j = 0;
-                        while (value >= values[j]) {
-                            j++;
+                    if(ok) {
+                        if (next == 0 || value > values[next - 1]) {
+                            values[next] = value;
+                        } else {
+                            uint j = 0;
+                            while (value >= values[j]) {
+                                j++;
+                            }
+                            for (uint k = uint(next); k > j; k--) {
+                                values[k] = values[k - 1];
+                            }
+                            values[j] = value;
                         }
-                        for (uint k = uint(next); k > j; k--) {
-                            values[k] = values[k - 1];
-                        }
-                        values[j] = value;
+                        next = next + 1;
                     }
-                    next = next + 1;
                 }
             }
 
             if (next > 0 && next >= minimumValid) {
-                return (values[next / 2], true);
+                return (values[(next - 1) / 2], true);
             }
             return (0, false);
         }
