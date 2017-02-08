@@ -11,15 +11,17 @@ layout:
 dependencies: {}
 ignore: []
 name: feed-aggregator
-dapple_version: 0.8.39
+dapple_version: 0.8.41
 environments:
   develop:
     objects: {}
     type: internal
+    chain: ''
   ropsten:
     objects:
       aggregator:
-        value: '0x2f4e8647f14092dcd11e0fb0240bbffa518b3ff5'
+        value: '0xf0cca23691ecf6aec18ea34d7ecf5bd4ffd15f78'
         type: >-
-          FeedAggregator100[ccefeaae3b5721ca362db22b87ec6eeee3354c7893e832e07812bd3b1861da1d]
+          FeedAggregator100[b97d27f82c31b2aac30d19d61a15bab84dac963cd5ff473de2707a97af47c2bc]
     type: ropsten
+    chain: ''
