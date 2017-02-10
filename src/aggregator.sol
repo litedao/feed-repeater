@@ -66,18 +66,21 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     }
 
     struct Feed {
-        address    feedbase;
+        address                 feedbase;
         bytes12                 position;
     }
 
-    function owner(bytes12 id) constant returns (address) {
-        return aggregators[id].owner;
+    function owner(bytes12 aggregatorId) constant returns (address) {
+        return aggregators[aggregatorId].owner;
     }
-    function label(bytes12 id) constant returns (bytes32) {
-        return aggregators[id].label;
+    function label(bytes12 aggregatorId) constant returns (bytes32) {
+        return aggregators[aggregatorId].label;
     }
-    function minimumValid(bytes12 id) constant returns (bytes12) {
-        return aggregators[id].minimumValid;
+    function minimumValid(bytes12 aggregatorId) constant returns (bytes12) {
+        return aggregators[aggregatorId].minimumValid;
+    }
+    function feedsQuantity(bytes12 aggregatorId) constant returns (bytes12) {
+        return bytes12(uint96(aggregators[aggregatorId].next)-1);
     }
 
     //------------------------------------------------------------------
@@ -168,6 +171,14 @@ contract FeedAggregator100 is FeedAggregatorInterface100
     //------------------------------------------------------------------
     // Reading aggregators
     //------------------------------------------------------------------
+
+    function getFeedInfo(bytes12 aggregatorId, bytes12 feedId) returns (address, bytes12) {
+        return (aggregators[aggregatorId].feeds[feedId].feedbase, aggregators[aggregatorId].feeds[feedId].position);
+    }
+
+    function tryGetFeed(bytes12 aggregatorId, bytes12 feedId) returns (bytes32, bool) {
+        return FeedbaseInterface200(aggregators[aggregatorId].feeds[feedId].feedbase).tryGet(aggregators[aggregatorId].feeds[feedId].position);
+    }
 
     function get(bytes12 aggregatorId) returns (bytes32 value) {
         var (val, ok) = tryGet(aggregatorId);

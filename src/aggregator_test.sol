@@ -130,6 +130,49 @@ contract FeedAggregatorTest is Test,
         assertTrue(ok);
     }
 
+    function test_try_get_feed() {
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 50);
+
+        aggregator.set(id, feedbase1, id1);
+
+        var (value, ok) = aggregator.tryGetFeed(id, id1);
+
+        assertEq32(value, 50);
+        assertTrue(ok);
+    }
+
+    function test_get_feedInfo() {
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 50);
+
+        aggregator.set(id, feedbase1, id1);
+
+        var (f, p) = aggregator.getFeedInfo(id, id1);
+
+        assertEq(f, feedbase1);
+        assertEq12(p, id1);
+    }
+
+    function test_feeds_quantity() {
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 11);
+
+        bytes12 id2 = feedbase2.claim();
+        feedbase2.set(id2, 5);
+
+        bytes12 id3 = feedbase3.claim();
+        feedbase3.set(id3, 10);
+
+        aggregator.set(id, feedbase1, id1);
+        aggregator.set(id, feedbase2, id2);
+        aggregator.set(id, feedbase3, id3);
+
+        var feedsQuantity = uint(aggregator.feedsQuantity(id));
+
+        assertEq(feedsQuantity, 3);
+    }
+
     function test_try_get_with_two_expired() {
         bytes12 newId = aggregator.claim(3);
 
