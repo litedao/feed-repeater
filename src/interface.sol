@@ -16,22 +16,22 @@
 
 pragma solidity ^0.4.8;
 
-contract FeedAggregatorEvents100 {
-    event LogClaim     (bytes12 indexed aggregatorId, address owner);
-    event LogSet       (bytes12 indexed aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
-    event LogUnset     (bytes12 indexed aggregatorId, bytes12 feedId);
-    event LogSetOwner  (bytes12 indexed aggregatorId, address owner);
-    event LogSetLabel  (bytes12 indexed aggregatorId, bytes32 label);
-    event LogMinimumValid (bytes12 indexed aggregatorId, bytes12 minimumValid);
+contract RepeaterEvents100 {
+    event LogClaim     (bytes12 indexed repeaterId, address owner);
+    event LogSet       (bytes12 indexed repeaterId, bytes12 feedId, address feedbase, bytes12 position);
+    event LogUnset     (bytes12 indexed repeaterId, bytes12 feedId);
+    event LogSetOwner  (bytes12 indexed repeaterId, address owner);
+    event LogSetLabel  (bytes12 indexed repeaterId, bytes32 label);
+    event LogMinimumValid (bytes12 indexed repeaterId, bytes12 minimumValid);
 }
 
-contract FeedAggregatorInterface100 {
-    function claim() returns (bytes12 aggregatorId);
-    function claim(bytes12 minimumValid) returns (bytes12 aggregatorId);
-    function set_minimumValid(bytes12 aggregatorId, bytes12 minimumValid);
-    function set(bytes12 aggregatorId, address feedbase, bytes12 position) returns (bytes12 feedId);
-    function set(bytes12 aggregatorId, bytes12 feedId, address feedbase, bytes12 position);
-    function unset(bytes12 aggregatorId, bytes12 feedId);
+contract RepeaterInterface100 {
+    function claim() returns (bytes12 repeaterId);
+    function claim(bytes12 minimumValid) returns (bytes12 repeaterId);
+    function set_minimumValid(bytes12 repeaterId, bytes12 minimumValid);
+    function set(bytes12 repeaterId, address feedbase, bytes12 position) returns (bytes12 feedId);
+    function set(bytes12 repeaterId, bytes12 feedId, address feedbase, bytes12 position);
+    function unset(bytes12 repeaterId, bytes12 feedId);
     function get(bytes12 id) returns (bytes32 value);
     function tryGet(bytes12 id) returns (bytes32 value, bool ok);
 }

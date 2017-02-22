@@ -10,7 +10,7 @@ layout:
   packages_directory: ./.dapple/packages/
 dependencies: {}
 ignore: []
-name: feed-aggregator
+name: ds-repeater
 dapple_version: 0.8.45
 environments:
   develop:
@@ -18,10 +18,6 @@ environments:
     type: internal
     chain: ''
   ropsten:
-    objects:
-      aggregator:
-        value: '0x509a7c442b0f8220886cfb9af1a11414680a6749'
-        type: >-
-          FeedAggregator100[6025ece1f0f5b5dbf0aba9cf5d0f4b0fc7d3c16799c61fc8bb9d27fc59bddfc5]
+    objects: {}
     type: ropsten
     chain: ''
