@@ -8,7 +8,7 @@ const inquirer = require('inquirer');
 const Preferences = require('preferences');
 const web3 = require('./web3');
 const utils = require('./utils');
-const dsfeeds = require('./lib/dsfeeds');
+const dsfeeds = require('./lib/ds-repeater');
 
 const Spinner = CLI.Spinner;
 const status = new Spinner('Connecting to network...');
@@ -139,19 +139,19 @@ program
   .option('-i, --info', 'prints default information');
 
 const commands = [
-  'inspect [feedbaseId]',
-  'owner [feedbaseId]',
-  'label [feedbaseId]',
-  'timestamp [feedbaseId]',
-  'expiration [feedbaseId]',
-  'expired [feedbaseId]',
-  'get [feedbaseId]',
-  'tryGet [feedbaseId]',
+  'inspect [repeaterId]',
+  'owner [repeaterId]',
+  'label [repeaterId]',
+  'timestamp [repeaterId]',
+  'expiration [repeaterId]',
+  'expired [repeaterId]',
+  'get [repeaterId]',
+  'tryGet [repeaterId]',
   'claim',
-  'set [feedbaseId, value, expiration]',
-  'set [feedbaseId, value] (expiration = unlimited)',
-  'set_owner [feedbaseId, ownerAddress]',
-  'set_label [feedbaseId, labelText]',
+  'set [repeaterId, value, expiration]',
+  'set [repeaterId, value] (expiration = unlimited)',
+  'set_owner [repeaterId, ownerAddress]',
+  'set_label [repeaterId, labelText]',
 ];
 
 commands.map(command => command.split(' ')[0]).filter(utils.unique).forEach((command) => {
@@ -166,7 +166,7 @@ program.on('--help', () => {
   console.log('  Examples:');
   console.log('');
   commands.forEach((command) => {
-    console.log(`    $ feeds ${command}`);
+    console.log(`    $ ds-repeater ${command}`);
   });
   console.log('');
 });

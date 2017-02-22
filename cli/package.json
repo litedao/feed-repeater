@@ -2,9 +2,9 @@
   "name": "ds-repeater",
   "version": "0.1.0",
   "description": "Command line app to manage repeaters easily.",
-  "main": "./feeds.js",
+  "main": "./ds-repeater.js",
   "bin": {
-    "ds-feeds": "./feeds.js"
+    "ds-repeater": "./ds-repeater.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/makerdao/ds-feeds.git"
+    "url": "git+https://github.com/makerdao/ds-repeater.git"
   },
   "keywords": [
     "feedbase",
@@ -28,9 +28,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/makerdao/ds-feeds/issues"
+    "url": "https://github.com/makerdao/ds-repeater/issues"
   },
-  "homepage": "https://github.com/makerdao/ds-feeds#readme",
+  "homepage": "https://github.com/makerdao/ds-repeater#readme",
   "dependencies": {
     "clui": "^0.3.1",
     "commander": "^2.9.0",

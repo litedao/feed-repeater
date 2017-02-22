@@ -20,5 +20,5 @@ gulp.task('build', ['dapple-build'], () =>
   gulp.src([
     '../build/js_module.js',
   ])
-  .pipe(gulp.dest('lib/')),
+  .pipe(gulp.dest('lib/'))
 );
