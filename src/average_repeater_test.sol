@@ -1,4 +1,4 @@
-/// repeater_test.sol --- functional tests for `repeater.sol'
+/// average_repeater_test.sol --- functional tests for `repeater.sol'
 
 // Copyright (C) 2015-2017  Nexus Development <https://nexusdev.us>
 // Copyright (C) 2015-2016  Nikolai Mushegian <nikolai@nexusdev.us>
@@ -26,14 +26,14 @@
 pragma solidity ^0.4.8;
 
 import "dapple/test.sol";
-import "feedbase/feedbase.sol";
+import "ds-feeds/feeds.sol";
 import "./repeater.sol";
 
-contract RepeaterTest is Test,
+contract AverageRepeaterTest is Test,
     RepeaterEvents100
 {
     FakePerson          assistant   = new FakePerson();
-    Repeater100         repeater  =   new Repeater100();
+    Repeater100         repeater  =   new AverageRepeater100();
     Feedbase200         feedbase1   = new Feedbase200(); 
     Feedbase200         feedbase2   = new Feedbase200();
     Feedbase200         feedbase3   = new Feedbase200();
@@ -126,7 +126,7 @@ contract RepeaterTest is Test,
 
         var (value, ok) = repeater.tryGet(id);
 
-        assertEq32(value, 11);
+        assertEq32(value, 12);
         assertTrue(ok);
     }
 
@@ -199,7 +199,7 @@ contract RepeaterTest is Test,
 
         var (value, ok) = repeater.tryGet(newId);
 
-        assertEq32(value, 10);
+        assertEq32(value, 16.5);
         assertTrue(ok);
     }
 
@@ -259,19 +259,19 @@ contract RepeaterTest is Test,
 
         var (value, ok) = repeater.tryGet(newId);
 
-        assertEq32(value, 11);
+        assertEq32(value, 12);
         assertTrue(ok);
 
         repeater.unset(newId, feedId1);
         repeater.unset(newId, feedId2);
 
         (value, ok) = repeater.tryGet(newId);
-        assertEq32(value, 16);
+        assertEq32(value, 14);
         assertTrue(ok);
 
         repeater.set(newId, feedbase2, id2);
         (value, ok) = repeater.tryGet(newId);
-        assertEq32(value, 10);
+        assertEq32(value, 12.25);
     }
 }
 

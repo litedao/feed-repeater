@@ -11,7 +11,7 @@ layout:
 dependencies: {}
 ignore: []
 name: ds-repeater
-dapple_version: 0.8.45
+dapple_version: 0.8.46
 environments:
   develop:
     objects: {}
@@ -19,5 +19,5 @@ environments:
     chain: ''
   ropsten:
     objects: {}
-    type: ropsten
+    type: ROPSTEN
     chain: ''
