@@ -1,3 +1,3 @@
-[submodule ".dapple/packages/feedbase"]
-	path = .dapple/packages/feedbase
-	url = https://github.com/nexusdev/feedbase.git
+[submodule ".dapple/packages/ds-feeds"]
+	path = .dapple/packages/ds-feeds
+	url = https://github.com/gbalabasquer/ds-feeds.git
