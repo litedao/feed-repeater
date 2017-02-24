@@ -199,7 +199,7 @@ contract AverageRepeaterTest is Test,
 
         var (value, ok) = repeater.tryGet(newId);
 
-        assertEq32(value, 16);
+        assertEq32(value, 11);
         assertTrue(ok);
     }
 
