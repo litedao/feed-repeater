@@ -34,9 +34,9 @@ contract MedianRepeaterTest is Test,
 {
     FakePerson          assistant   = new FakePerson();
     Repeater100         repeater  =   new MedianRepeater100();
-    Feedbase200         feedbase1   = new Feedbase200(); 
-    Feedbase200         feedbase2   = new Feedbase200();
-    Feedbase200         feedbase3   = new Feedbase200();
+    DSFeeds200         feedbase1   = new DSFeeds200(); 
+    DSFeeds200         feedbase2   = new DSFeeds200();
+    DSFeeds200         feedbase3   = new DSFeeds200();
     
     bytes12 id;
     bytes12 constant INITIAL_MINIMUM_VALID = 3;
@@ -86,7 +86,7 @@ contract MedianRepeaterTest is Test,
     }
 
     function testFail_set_owner_unauth() {
-        Feedbase200(assistant).set_owner(id, assistant);
+        DSFeeds200(assistant).set_owner(id, assistant);
     }
 
     function test_set_label() {
@@ -99,7 +99,7 @@ contract MedianRepeaterTest is Test,
     }
 
     function testFail_set_label_unauth() {
-        Feedbase200(assistant).set_label(id, "foo");
+        DSFeeds200(assistant).set_label(id, "foo");
     }
 
     function test_try_get() {
@@ -277,6 +277,6 @@ contract MedianRepeaterTest is Test,
 
 contract FakePerson is Tester {
     function tryGet(bytes12 id) returns (bytes32, bool) {
-        return Feedbase200(_t).tryGet(id);
+        return DSFeeds200(_t).tryGet(id);
     }
 }

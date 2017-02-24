@@ -27,16 +27,16 @@ pragma solidity ^0.4.8;
 
 import "dapple/test.sol";
 import "ds-feeds/feeds.sol";
-import "./repeater.sol";
+import "./average_repeater.sol";
 
 contract AverageRepeaterTest is Test,
     RepeaterEvents100
 {
     FakePerson          assistant   = new FakePerson();
     Repeater100         repeater  =   new AverageRepeater100();
-    Feedbase200         feedbase1   = new Feedbase200(); 
-    Feedbase200         feedbase2   = new Feedbase200();
-    Feedbase200         feedbase3   = new Feedbase200();
+    DSFeeds200         feedbase1   = new DSFeeds200(); 
+    DSFeeds200         feedbase2   = new DSFeeds200();
+    DSFeeds200         feedbase3   = new DSFeeds200();
     
     bytes12 id;
     bytes12 constant INITIAL_MINIMUM_VALID = 3;
@@ -86,7 +86,7 @@ contract AverageRepeaterTest is Test,
     }
 
     function testFail_set_owner_unauth() {
-        Feedbase200(assistant).set_owner(id, assistant);
+        DSFeeds200(assistant).set_owner(id, assistant);
     }
 
     function test_set_label() {
@@ -99,7 +99,7 @@ contract AverageRepeaterTest is Test,
     }
 
     function testFail_set_label_unauth() {
-        Feedbase200(assistant).set_label(id, "foo");
+        DSFeeds200(assistant).set_label(id, "foo");
     }
 
     function test_try_get() {
@@ -199,7 +199,7 @@ contract AverageRepeaterTest is Test,
 
         var (value, ok) = repeater.tryGet(newId);
 
-        assertEq32(value, 16.5);
+        assertEq32(value, 16);
         assertTrue(ok);
     }
 
@@ -271,12 +271,12 @@ contract AverageRepeaterTest is Test,
 
         repeater.set(newId, feedbase2, id2);
         (value, ok) = repeater.tryGet(newId);
-        assertEq32(value, 12.25);
+        assertEq32(value, 12);
     }
 }
 
 contract FakePerson is Tester {
     function tryGet(bytes12 id) returns (bytes32, bool) {
-        return Feedbase200(_t).tryGet(id);
+        return DSFeeds200(_t).tryGet(id);
     }
 }
