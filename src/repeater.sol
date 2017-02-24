@@ -41,7 +41,7 @@
 pragma solidity ^0.4.8;
 
 import "./interface.sol";
-import "feedbase/interface.sol";
+import "ds-feeds/interface.sol";
 
 contract Repeater100 is RepeaterInterface100
                       , RepeaterEvents100
@@ -66,7 +66,7 @@ contract Repeater100 is RepeaterInterface100
     }
 
     struct Feed {
-        address                 feedbase;
+        address                 addr;
         bytes12                 position;
     }
 
@@ -116,7 +116,7 @@ contract Repeater100 is RepeaterInterface100
     // Updating repeaters
     //------------------------------------------------------------------
 
-    function set(bytes12 repeaterId, address feedbase, bytes12 position)
+    function set(bytes12 repeaterId, address addr, bytes12 position)
          repeater_auth(repeaterId)
          returns (bytes12 feedId)
     {
@@ -125,23 +125,23 @@ contract Repeater100 is RepeaterInterface100
 
         repeaters[repeaterId].next = bytes12(uint96(feedId)+1);
 
-        set(repeaterId, feedId, feedbase, position);
+        set(repeaterId, feedId, addr, position);
         return feedId;
     }
 
-    function set(bytes12 repeaterId, bytes12 feedId, address feedbase, bytes12 position)
+    function set(bytes12 repeaterId, bytes12 feedId, address addr, bytes12 position)
          repeater_auth(repeaterId)
     {
-        repeaters[repeaterId].feeds[feedId].feedbase = feedbase;
+        repeaters[repeaterId].feeds[feedId].addr = addr;
         repeaters[repeaterId].feeds[feedId].position = position;
 
-        LogSet(repeaterId, feedId, feedbase, position);
+        LogSet(repeaterId, feedId, addr, position);
     }
 
     function unset(bytes12 repeaterId, bytes12 feedId)
          repeater_auth(repeaterId)
     {
-        repeaters[repeaterId].feeds[feedId].feedbase = address(0);
+        repeaters[repeaterId].feeds[feedId].addr = address(0);
         repeaters[repeaterId].feeds[feedId].position = 0;
 
         LogUnset(repeaterId, feedId);
@@ -173,11 +173,11 @@ contract Repeater100 is RepeaterInterface100
     //------------------------------------------------------------------
 
     function getFeedInfo(bytes12 repeaterId, bytes12 feedId) returns (address, bytes12) {
-        return (repeaters[repeaterId].feeds[feedId].feedbase, repeaters[repeaterId].feeds[feedId].position);
+        return (repeaters[repeaterId].feeds[feedId].addr, repeaters[repeaterId].feeds[feedId].position);
     }
 
     function tryGetFeed(bytes12 repeaterId, bytes12 feedId) returns (bytes32, bool) {
-        return FeedbaseInterface200(repeaters[repeaterId].feeds[feedId].feedbase).tryGet(repeaters[repeaterId].feeds[feedId].position);
+        return DSFeedsInterface200(repeaters[repeaterId].feeds[feedId].addr).tryGet(repeaters[repeaterId].feeds[feedId].position);
     }
 
     function get(bytes12 repeaterId) returns (bytes32 value) {
