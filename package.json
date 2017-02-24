@@ -1,9 +1,0 @@
-{
-  "name": "aggregator",
-  "version": "0.9.0",
-  "bin": "bin/aggregator",
-  "main": "lib/aggregator.js",
-  "dependencies": {
-    "web3": "^0.16.0"
-  }
-}

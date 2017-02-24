@@ -1,4 +1,4 @@
-/// aggregator_test.sol --- functional tests for `aggregator.sol'
+/// repeater_test.sol --- functional tests for `repeater.sol'
 
 // Copyright (C) 2015-2017  Nexus Development <https://nexusdev.us>
 // Copyright (C) 2015-2016  Nikolai Mushegian <nikolai@nexusdev.us>
@@ -6,20 +6,20 @@
 // Copyright (C) 2017       Mariano Conti           <nanexcool@gmail.com>
 // Copyright (C) 2017       Gonzalo Balabasquer     <gbalabasquer@gmail.com>
 
-// This file is part of FeedAggregator.
+// This file is part of Repeater.
 
-// FeedAggregator is free software; you can redistribute and/or modify it
+// Repeater is free software; you can redistribute and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
-// FeedAggregator is distributed in the hope that it will be useful,
+// Repeater is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty
 // of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with FeedAggregator.  If not, see <http://www.gnu.org/licenses/>.
+// along with Repeater.  If not, see <http://www.gnu.org/licenses/>.
 
 /// Code:
 
@@ -27,13 +27,13 @@ pragma solidity ^0.4.8;
 
 import "dapple/test.sol";
 import "feedbase/feedbase.sol";
-import "./aggregator.sol";
+import "./repeater.sol";
 
-contract FeedAggregatorTest is Test,
-    FeedAggregatorEvents100
+contract RepeaterTest is Test,
+    RepeaterEvents100
 {
     FakePerson          assistant   = new FakePerson();
-    FeedAggregator100   aggregator  = new FeedAggregator100();
+    Repeater100         repeater  =   new Repeater100();
     Feedbase200         feedbase1   = new Feedbase200(); 
     Feedbase200         feedbase2   = new Feedbase200();
     Feedbase200         feedbase3   = new Feedbase200();
@@ -42,8 +42,8 @@ contract FeedAggregatorTest is Test,
     bytes12 constant INITIAL_MINIMUM_VALID = 3;
 
     function setUp() {
-        assistant._target(aggregator);
-        id = aggregator.claim(INITIAL_MINIMUM_VALID);
+        assistant._target(repeater);
+        id = repeater.claim(INITIAL_MINIMUM_VALID);
     }
 
     function time() returns (uint40) {
@@ -51,38 +51,38 @@ contract FeedAggregatorTest is Test,
     }
 
     function test_claim() {
-        expectEventsExact(aggregator);
+        expectEventsExact(repeater);
 
         assertEq(uint(id), 1);
 
-        assertEq(uint(aggregator.claim(1)), 2);
+        assertEq(uint(repeater.claim(1)), 2);
 
         LogClaim(2, this);
         LogMinimumValid(2, 1);
     }
 
     function test_claim_with_no_minimum() {
-        expectEventsExact(aggregator);
+        expectEventsExact(repeater);
 
         assertEq(uint(id), 1);
 
-        assertEq(uint(aggregator.claim()), 2);
+        assertEq(uint(repeater.claim()), 2);
 
         LogClaim(2, this);
         LogMinimumValid(2, 1);
     }
 
     function test_is_owner() {
-        assertEq(aggregator.owner(id), this);
+        assertEq(repeater.owner(id), this);
     }
 
     function test_set_owner() {
-        expectEventsExact(aggregator);
+        expectEventsExact(repeater);
 
-        aggregator.set_owner(id, assistant);
+        repeater.set_owner(id, assistant);
         LogSetOwner(id, assistant);
 
-        assertEq(aggregator.owner(id), assistant);
+        assertEq(repeater.owner(id), assistant);
     }
 
     function testFail_set_owner_unauth() {
@@ -90,12 +90,12 @@ contract FeedAggregatorTest is Test,
     }
 
     function test_set_label() {
-        expectEventsExact(aggregator);
+        expectEventsExact(repeater);
 
-        aggregator.set_label(id, "foo");
+        repeater.set_label(id, "foo");
         LogSetLabel(id, "foo");
 
-        assertEq32(aggregator.label(id), "foo");
+        assertEq32(repeater.label(id), "foo");
     }
 
     function testFail_set_label_unauth() {
@@ -118,13 +118,13 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        aggregator.set(id, feedbase1, id1);
-        aggregator.set(id, feedbase2, id2);
-        aggregator.set(id, feedbase3, id3);
-        aggregator.set(id, feedbase1, id4);
-        aggregator.set(id, feedbase2, id5);
+        repeater.set(id, feedbase1, id1);
+        repeater.set(id, feedbase2, id2);
+        repeater.set(id, feedbase3, id3);
+        repeater.set(id, feedbase1, id4);
+        repeater.set(id, feedbase2, id5);
 
-        var (value, ok) = aggregator.tryGet(id);
+        var (value, ok) = repeater.tryGet(id);
 
         assertEq32(value, 11);
         assertTrue(ok);
@@ -134,9 +134,9 @@ contract FeedAggregatorTest is Test,
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 50);
 
-        aggregator.set(id, feedbase1, id1);
+        repeater.set(id, feedbase1, id1);
 
-        var (value, ok) = aggregator.tryGetFeed(id, id1);
+        var (value, ok) = repeater.tryGetFeed(id, id1);
 
         assertEq32(value, 50);
         assertTrue(ok);
@@ -146,9 +146,9 @@ contract FeedAggregatorTest is Test,
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 50);
 
-        aggregator.set(id, feedbase1, id1);
+        repeater.set(id, feedbase1, id1);
 
-        var (f, p) = aggregator.getFeedInfo(id, id1);
+        var (f, p) = repeater.getFeedInfo(id, id1);
 
         assertEq(f, feedbase1);
         assertEq12(p, id1);
@@ -164,17 +164,17 @@ contract FeedAggregatorTest is Test,
         bytes12 id3 = feedbase3.claim();
         feedbase3.set(id3, 10);
 
-        aggregator.set(id, feedbase1, id1);
-        aggregator.set(id, feedbase2, id2);
-        aggregator.set(id, feedbase3, id3);
+        repeater.set(id, feedbase1, id1);
+        repeater.set(id, feedbase2, id2);
+        repeater.set(id, feedbase3, id3);
 
-        var feedsQuantity = uint(aggregator.feedsQuantity(id));
+        var feedsQuantity = uint(repeater.feedsQuantity(id));
 
         assertEq(feedsQuantity, 3);
     }
 
     function test_try_get_with_two_expired() {
-        bytes12 newId = aggregator.claim(3);
+        bytes12 newId = repeater.claim(3);
 
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 11, 0); // expired
@@ -191,20 +191,20 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        aggregator.set(newId, feedbase1, id1);
-        aggregator.set(newId, feedbase2, id2);
-        aggregator.set(newId, feedbase3, id3);
-        aggregator.set(newId, feedbase1, id4);
-        aggregator.set(newId, feedbase2, id5);
+        repeater.set(newId, feedbase1, id1);
+        repeater.set(newId, feedbase2, id2);
+        repeater.set(newId, feedbase3, id3);
+        repeater.set(newId, feedbase1, id4);
+        repeater.set(newId, feedbase2, id5);
 
-        var (value, ok) = aggregator.tryGet(newId);
+        var (value, ok) = repeater.tryGet(newId);
 
         assertEq32(value, 10);
         assertTrue(ok);
     }
 
     function test_try_get_with_three_expired() {
-        bytes12 newId = aggregator.claim(3);
+        bytes12 newId = repeater.claim(3);
 
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 11, 0);  // expired
@@ -221,20 +221,20 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        aggregator.set(newId, feedbase1, id1);
-        aggregator.set(newId, feedbase2, id2);
-        aggregator.set(newId, feedbase3, id3);
-        aggregator.set(newId, feedbase1, id4);
-        aggregator.set(newId, feedbase2, id5);
+        repeater.set(newId, feedbase1, id1);
+        repeater.set(newId, feedbase2, id2);
+        repeater.set(newId, feedbase3, id3);
+        repeater.set(newId, feedbase1, id4);
+        repeater.set(newId, feedbase2, id5);
 
-        var (value, ok) = aggregator.tryGet(newId);
+        var (value, ok) = repeater.tryGet(newId);
 
         assertEq32(value, 0);
         assertFalse(ok);
     }
 
     function test_unset() {
-        bytes12 newId = aggregator.claim(3);
+        bytes12 newId = repeater.claim(3);
 
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 11);
@@ -251,26 +251,26 @@ contract FeedAggregatorTest is Test,
         bytes12 id5 = feedbase2.claim();
         feedbase2.set(id5, 18);
 
-        bytes12 feedId1 = aggregator.set(newId, feedbase1, id1);
-        bytes12 feedId2 = aggregator.set(newId, feedbase2, id2);
-        bytes12 feedId3 = aggregator.set(newId, feedbase3, id3);
-        bytes12 feedId4 = aggregator.set(newId, feedbase1, id4);
-        bytes12 feedId5 = aggregator.set(newId, feedbase2, id5);
+        bytes12 feedId1 = repeater.set(newId, feedbase1, id1);
+        bytes12 feedId2 = repeater.set(newId, feedbase2, id2);
+        bytes12 feedId3 = repeater.set(newId, feedbase3, id3);
+        bytes12 feedId4 = repeater.set(newId, feedbase1, id4);
+        bytes12 feedId5 = repeater.set(newId, feedbase2, id5);
 
-        var (value, ok) = aggregator.tryGet(newId);
+        var (value, ok) = repeater.tryGet(newId);
 
         assertEq32(value, 11);
         assertTrue(ok);
 
-        aggregator.unset(newId, feedId1);
-        aggregator.unset(newId, feedId2);
+        repeater.unset(newId, feedId1);
+        repeater.unset(newId, feedId2);
 
-        (value, ok) = aggregator.tryGet(newId);
+        (value, ok) = repeater.tryGet(newId);
         assertEq32(value, 16);
         assertTrue(ok);
 
-        aggregator.set(newId, feedbase2, id2);
-        (value, ok) = aggregator.tryGet(newId);
+        repeater.set(newId, feedbase2, id2);
+        (value, ok) = repeater.tryGet(newId);
         assertEq32(value, 10);
     }
 }
