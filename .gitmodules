@@ -1,6 +1,6 @@
 [submodule "lib/ds-feeds"]
 	path = lib/ds-feeds
-	url = https://github.com/dapphub/ds-feeds.git
+	url = https://github.com/dapphub/ds-feeds
 [submodule "lib/ds-test"]
 	path = lib/ds-test
 	url = https://github.com/dapphub/ds-test
