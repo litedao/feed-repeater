@@ -16,7 +16,7 @@
 
 pragma solidity ^0.4.8;
 
-contract RepeaterEvents100 {
+contract RepeaterEvents {
     event LogClaim     (bytes12 indexed repeaterId, address owner);
     event LogSet       (bytes12 indexed repeaterId, bytes12 feedId, address addr, bytes12 position);
     event LogUnset     (bytes12 indexed repeaterId, bytes12 feedId);
@@ -25,7 +25,7 @@ contract RepeaterEvents100 {
     event LogMinimumValid (bytes12 indexed repeaterId, bytes12 minimumValid);
 }
 
-contract RepeaterInterface100 {
+contract RepeaterInterface {
     function claim() returns (bytes12 repeaterId);
     function claim(bytes12 minimumValid) returns (bytes12 repeaterId);
     function set_minimumValid(bytes12 repeaterId, bytes12 minimumValid);
@@ -33,5 +33,5 @@ contract RepeaterInterface100 {
     function set(bytes12 repeaterId, bytes12 feedId, address addr, bytes12 position);
     function unset(bytes12 repeaterId, bytes12 feedId);
     function get(bytes12 id) returns (bytes32 value);
-    function tryGet(bytes12 id) returns (bytes32 value, bool ok);
+    function tryGet(bytes12 id) constant returns (bytes32 value, bool ok);
 }

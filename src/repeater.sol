@@ -43,8 +43,8 @@ pragma solidity ^0.4.8;
 import "./interface.sol";
 import "ds-feeds/interface.sol";
 
-contract Repeater100 is RepeaterInterface100
-                      , RepeaterEvents100
+contract Repeater is RepeaterInterface
+                      , RepeaterEvents
 {
     mapping (bytes12 => Repeater) repeaters;
     bytes12 next = 0x1;
@@ -177,7 +177,7 @@ contract Repeater100 is RepeaterInterface100
     }
 
     function tryGetFeed(bytes12 repeaterId, bytes12 feedId) returns (bytes32, bool) {
-        return DSFeedsInterface200(repeaters[repeaterId].feeds[feedId].addr).tryGet(repeaters[repeaterId].feeds[feedId].position);
+        return DSFeedsInterface(repeaters[repeaterId].feeds[feedId].addr).tryGet(repeaters[repeaterId].feeds[feedId].position);
     }
 
     function get(bytes12 repeaterId) returns (bytes32 value) {
@@ -186,7 +186,7 @@ contract Repeater100 is RepeaterInterface100
         return val;
     }
 
-    function tryGet(bytes12 repeaterId) returns (bytes32 value, bool ok) {
+    function tryGet(bytes12 repeaterId) constant returns (bytes32 value, bool ok) {
         return (0, false);
     }
 }

@@ -3,18 +3,17 @@ pragma solidity ^0.4.8;
 import "./repeater.sol";
 import "ds-feeds/interface.sol";
 
-contract MedianRepeater100 is Repeater100
+contract MedianRepeater is Repeater
 {
-    function tryGet(bytes12 repeaterId) returns (bytes32 value, bool ok) {
+    function tryGet(bytes12 repeaterId) constant returns (bytes32 value, bool ok) {
         uint minimumValid = uint(repeaters[repeaterId].minimumValid);
 
         if (uint(repeaters[repeaterId].next) > 1 && uint(repeaters[repeaterId].next) > minimumValid) {
-            mapping (uint => bytes32) values;
+            bytes32[] memory values = new bytes32[](uint(repeaters[repeaterId].next));
             uint next = 0;
-
             for (uint i = 1; i < uint(repeaters[repeaterId].next); i++) {
                 if (repeaters[repeaterId].feeds[bytes12(i)].addr != 0) {
-                    (value, ok) = DSFeedsInterface200(repeaters[repeaterId].feeds[bytes12(i)].addr).tryGet(repeaters[repeaterId].feeds[bytes12(i)].position);
+                    (value, ok) = DSFeedsInterface(repeaters[repeaterId].feeds[bytes12(i)].addr).tryGet(repeaters[repeaterId].feeds[bytes12(i)].position);
 
                     if(ok) {
                         if (next == 0 || value > values[next - 1]) {
