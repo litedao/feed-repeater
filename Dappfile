@@ -1,23 +1,6 @@
-description: ''
-authors: []
-license: MIT
-keywords: []
-version: 0.0.1-dev
-tags: []
-layout:
-  sol_sources: ./src
-  build_dir: ./build
-  packages_directory: ./.dapple/packages/
-dependencies: {}
-ignore: []
-name: ds-repeater
-dapple_version: 0.8.46
-environments:
-  develop:
-    objects: {}
-    type: internal
-    chain: ''
-  ropsten:
-    objects: {}
-    type: ROPSTEN
-    chain: ''
+name            feed-repeater
+description
+version         0.0.1
+
+author          gonzalo
+license         Apache-2.0

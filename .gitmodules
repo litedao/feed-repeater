@@ -1,3 +1,3 @@
-[submodule ".dapple/packages/ds-feeds"]
-	path = .dapple/packages/ds-feeds
-	url = https://github.com/gbalabasquer/ds-feeds.git
+[submodule "lib/ds-feeds"]
+	path = lib/ds-feeds
+	url = https://github.com/dapphub/ds-feeds.git
