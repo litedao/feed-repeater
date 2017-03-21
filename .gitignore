@@ -1,3 +1,2 @@
-**/chain_db/
-build/
-node_modules//out
+/out
+/build
