@@ -16,8 +16,7 @@ contract MedianRepeater is Repeater
                 if (repeaters[id].feeds[bytes12(i)].addr != 0) {
                     if (peekFeed(id, bytes12(i))) {
                         value = readFeed(id, bytes12(i));
-
-                        if (next == 0 || value > values[next - 1]) {
+                        if (next == 0 || value >= values[next - 1]) {
                             values[next] = value;
                         } else {
                             uint j = 0;
@@ -29,11 +28,11 @@ contract MedianRepeater is Repeater
                             }
                             values[j] = value;
                         }
-                        next = next + 1;
+                        next++;
                     }
                 }
             }
-
+            
             if (next > 0 && next >= min) {
                 return values[(next - 1) / 2];
             }
