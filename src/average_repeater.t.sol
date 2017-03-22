@@ -124,8 +124,10 @@ contract AverageRepeaterTest is DSTest,
         repeater.set(id, feedbase1, id4);
         repeater.set(id, feedbase2, id5);
 
+        var ok = repeater.peek(id);
         var value = repeater.read(id);
 
+        assert(ok);
         assertEq32(value, 12);
     }
 
@@ -135,7 +137,7 @@ contract AverageRepeaterTest is DSTest,
 
         repeater.set(id, feedbase1, id1);
 
-        var value = repeater.tryGetFeed(id, id1);
+        var value = repeater.readFeed(id, id1);
 
         assertEq32(value, 50);
     }
@@ -195,8 +197,10 @@ contract AverageRepeaterTest is DSTest,
         repeater.set(newId, feedbase1, id4);
         repeater.set(newId, feedbase2, id5);
 
+        var ok = repeater.peek(newId);
         var value = repeater.read(newId);
 
+        assert(ok);
         assertEq32(value, 11);
     }
 
@@ -224,8 +228,10 @@ contract AverageRepeaterTest is DSTest,
         repeater.set(newId, feedbase1, id4);
         repeater.set(newId, feedbase2, id5);
 
+        var ok = repeater.peek(newId);
         var value = repeater.read(newId);
 
+        assert(!ok);
         assertEq32(value, 0);
     }
 
@@ -253,18 +259,27 @@ contract AverageRepeaterTest is DSTest,
         bytes12 feedId4 = repeater.set(newId, feedbase1, id4);
         bytes12 feedId5 = repeater.set(newId, feedbase2, id5);
 
+        var ok = repeater.peek(newId);
         var value = repeater.read(newId);
 
+        assert(ok);
         assertEq32(value, 12);
 
         repeater.unset(newId, feedId1);
         repeater.unset(newId, feedId2);
 
+        ok = repeater.peek(newId);
         value = repeater.read(newId);
+
+        assert(ok);
         assertEq32(value, 14);
 
         repeater.set(newId, feedbase2, id2);
+
+        ok = repeater.peek(newId);
         value = repeater.read(newId);
+
+        assert(ok);
         assertEq32(value, 12);
     }
 }

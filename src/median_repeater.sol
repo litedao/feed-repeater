@@ -13,8 +13,8 @@ contract MedianRepeater is Repeater
             uint next = 0;
             for (uint i = 1; i < uint(repeaters[id].next); i++) {
                 if (repeaters[id].feeds[bytes12(i)].addr != 0) {
-                    if (DSFeedsInterface(repeaters[id].feeds[bytes12(i)].addr).peek(repeaters[id].feeds[bytes12(i)].position)) {
-                        value = DSFeedsInterface(repeaters[id].feeds[bytes12(i)].addr).read(repeaters[id].feeds[bytes12(i)].position);
+                    if (peekFeed(id, bytes12(i))) {
+                        value = readFeed(id, bytes12(i));
 
                         if (next == 0 || value > values[next - 1]) {
                             values[next] = value;

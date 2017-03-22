@@ -172,26 +172,32 @@ contract Repeater is RepeaterInterface
     // Reading repeaters
     //------------------------------------------------------------------
 
-    function getFeedInfo(bytes12 id, bytes12 feedId) returns (address, bytes12) {
+    function getFeedInfo(bytes12 id, bytes12 feedId) constant returns (address, bytes12) {
         return (repeaters[id].feeds[feedId].addr, repeaters[id].feeds[feedId].position);
     }
 
-    function tryGetFeed(bytes12 id, bytes12 feedId) constant returns (bytes32) {
+    function peekFeed(bytes12 id, bytes12 feedId) constant returns (bool) {
+        return DSFeedsInterface(repeaters[id].feeds[feedId].addr).peek(repeaters[id].feeds[feedId].position);
+    }
+
+    function readFeed(bytes12 id, bytes12 feedId) constant returns (bytes32) {
         return DSFeedsInterface(repeaters[id].feeds[feedId].addr).read(repeaters[id].feeds[feedId].position);
     }
 
     function peek(bytes12 id) constant returns (bool ok) {
-        ok = true;
+        ok = false;
         uint min = uint(repeaters[id].min);
 
         if (uint(repeaters[id].next) > 1 && uint(repeaters[id].next) > min) {
             uint next = 0;
+            uint valid = 0;
             for (uint i = 1; i < uint(repeaters[id].next); i++) {
                 if (repeaters[id].feeds[bytes12(i)].addr != 0) {
-                    ok = DSFeedsInterface(repeaters[id].feeds[bytes12(i)].addr).peek(repeaters[id].feeds[bytes12(i)].position);
-                    if (!ok) return false;
+                    ok = peekFeed(id, bytes12(i));
+                    if (ok) valid++;
                 }
             }
+            ok = valid >= min;
         }
     }
 

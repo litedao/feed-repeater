@@ -124,18 +124,20 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(id, feedbase1, id4);
         repeater.set(id, feedbase2, id5);
 
+        var ok = repeater.peek(id);
         var value = repeater.read(id);
 
+        assert(ok);
         assertEq32(value, 11);
     }
 
-    function test_try_get_feed() {
+    function test_read_feed() {
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 50);
 
         repeater.set(id, feedbase1, id1);
 
-        var value = repeater.tryGetFeed(id, id1);
+        var value = repeater.readFeed(id, id1);
 
         assertEq32(value, 50);
     }
@@ -195,8 +197,10 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(newId, feedbase1, id4);
         repeater.set(newId, feedbase2, id5);
 
-       var value = repeater.read(newId);
+        var ok = repeater.peek(newId);
+        var value = repeater.read(newId);
 
+        assert(ok);
         assertEq32(value, 10);
     }
 
@@ -224,8 +228,10 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(newId, feedbase1, id4);
         repeater.set(newId, feedbase2, id5);
 
-       var value = repeater.read(newId);
+        var ok = repeater.peek(newId);
+        var value = repeater.read(newId);
 
+        assert(!ok);
         assertEq32(value, 0);
     }
 
@@ -253,18 +259,27 @@ contract MedianRepeaterTest is DSTest,
         bytes12 feedId4 = repeater.set(newId, feedbase1, id4);
         bytes12 feedId5 = repeater.set(newId, feedbase2, id5);
 
-       var value = repeater.read(newId);
+        var ok = repeater.peek(newId);
+        var value = repeater.read(newId);
 
+        assert(ok);
         assertEq32(value, 11);
 
         repeater.unset(newId, feedId1);
         repeater.unset(newId, feedId2);
 
+        ok = repeater.peek(newId);
         value = repeater.read(newId);
+
+        assert(ok);
         assertEq32(value, 16);
 
         repeater.set(newId, feedbase2, id2);
+
+        ok = repeater.peek(newId);
         value = repeater.read(newId);
+
+        assert(ok);
         assertEq32(value, 10);
     }
 }
@@ -276,7 +291,7 @@ contract FakePerson {
         repeater  = repeater_;
     }
 
-    function tryGet(bytes12 id) returns (bytes32) {
+    function read(bytes12 id) returns (bytes32) {
         return repeater.read(id);
     }
 }
