@@ -1,7 +1,6 @@
 pragma solidity ^0.4.8;
 
 import "./repeater.sol";
-import "ds-feeds/interface.sol";
 
 contract MedianRepeater is Repeater
 {
