@@ -5,12 +5,13 @@ import "ds-feeds/interface.sol";
 
 contract MedianRepeater is Repeater
 {
-    function read(bytes12 id) constant returns (bytes32 value) {
+    function read(bytes12 id) constant returns (bytes32) {
         uint min = uint(repeaters[id].min);
 
         if (uint(repeaters[id].next) > 1 && uint(repeaters[id].next) > min) {
             bytes32[] memory values = new bytes32[](uint(repeaters[id].next));
             uint next = 0;
+            bytes32 value;
             for (uint i = 1; i < uint(repeaters[id].next); i++) {
                 if (repeaters[id].feeds[bytes12(i)].addr != 0) {
                     if (peekFeed(id, bytes12(i))) {
@@ -36,7 +37,7 @@ contract MedianRepeater is Repeater
             if (next > 0 && next >= min) {
                 return values[(next - 1) / 2];
             }
-            return 0;
         }
+        throw;
     }
 }

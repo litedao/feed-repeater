@@ -204,6 +204,35 @@ contract MedianRepeaterTest is DSTest,
         assertEq32(value, 10);
     }
 
+    function testFail_read_with_three_expired() {
+        bytes12 newId = repeater.claim(3);
+
+        bytes12 id1 = feedbase1.claim();
+        feedbase1.set(id1, 11, 0);  // expired
+        
+        bytes12 id2 = feedbase2.claim();
+        feedbase2.set(id2, 5, 0);  // expired
+        
+        bytes12 id3 = feedbase3.claim();
+        feedbase3.set(id3, 10);
+
+        bytes12 id4 = feedbase1.claim();
+        feedbase1.set(id4, 16, 0);  // expired
+
+        bytes12 id5 = feedbase2.claim();
+        feedbase2.set(id5, 18);
+
+        repeater.set(newId, feedbase1, id1);
+        repeater.set(newId, feedbase2, id2);
+        repeater.set(newId, feedbase3, id3);
+        repeater.set(newId, feedbase1, id4);
+        repeater.set(newId, feedbase2, id5);
+
+        var value = repeater.read(newId);
+
+        assertEq32(value, 0);
+    }
+
     function test_read_with_three_expired() {
         bytes12 newId = repeater.claim(3);
 
@@ -229,10 +258,8 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(newId, feedbase2, id5);
 
         var ok = repeater.peek(newId);
-        var value = repeater.read(newId);
 
         assert(!ok);
-        assertEq32(value, 0);
     }
 
     function test_unset() {
