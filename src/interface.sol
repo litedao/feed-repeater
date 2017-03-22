@@ -17,21 +17,21 @@
 pragma solidity ^0.4.8;
 
 contract RepeaterEvents {
-    event LogClaim     (bytes12 indexed repeaterId, address owner);
-    event LogSet       (bytes12 indexed repeaterId, bytes12 feedId, address addr, bytes12 position);
-    event LogUnset     (bytes12 indexed repeaterId, bytes12 feedId);
-    event LogSetOwner  (bytes12 indexed repeaterId, address owner);
-    event LogSetLabel  (bytes12 indexed repeaterId, bytes32 label);
-    event LogMinimumValid (bytes12 indexed repeaterId, bytes12 minimumValid);
+    event LogClaim     (bytes12 indexed id, address owner);
+    event LogSet       (bytes12 indexed id, bytes12 feedId, address addr, bytes12 position);
+    event LogUnset     (bytes12 indexed id, bytes12 feedId);
+    event LogSetOwner  (bytes12 indexed id, address owner);
+    event LogSetLabel  (bytes12 indexed id, bytes32 label);
+    event LogSetMin    (bytes12 indexed id, bytes12 min);
 }
 
 contract RepeaterInterface {
-    function claim() returns (bytes12 repeaterId);
-    function claim(bytes12 minimumValid) returns (bytes12 repeaterId);
-    function set_minimumValid(bytes12 repeaterId, bytes12 minimumValid);
-    function set(bytes12 repeaterId, address addr, bytes12 position) returns (bytes12 feedId);
-    function set(bytes12 repeaterId, bytes12 feedId, address addr, bytes12 position);
-    function unset(bytes12 repeaterId, bytes12 feedId);
-    function get(bytes12 id) returns (bytes32 value);
-    function tryGet(bytes12 id) constant returns (bytes32 value, bool ok);
+    function claim() returns (bytes12 id);
+    function claim(bytes12 min) returns (bytes12 id);
+    function set_min(bytes12 id, bytes12 min);
+    function set(bytes12 id, address addr, bytes12 position) returns (bytes12 feedId);
+    function set(bytes12 id, bytes12 feedId, address addr, bytes12 position);
+    function unset(bytes12 id, bytes12 feedId);
+    function peek(bytes12 id) constant returns (bool ok);
+    function read(bytes12 id) constant returns (bytes32 value);
 }

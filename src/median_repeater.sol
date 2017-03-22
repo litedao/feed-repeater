@@ -5,17 +5,17 @@ import "ds-feeds/interface.sol";
 
 contract MedianRepeater is Repeater
 {
-    function tryGet(bytes12 repeaterId) constant returns (bytes32 value, bool ok) {
-        uint minimumValid = uint(repeaters[repeaterId].minimumValid);
+    function read(bytes12 id) constant returns (bytes32 value) {
+        uint min = uint(repeaters[id].min);
 
-        if (uint(repeaters[repeaterId].next) > 1 && uint(repeaters[repeaterId].next) > minimumValid) {
-            bytes32[] memory values = new bytes32[](uint(repeaters[repeaterId].next));
+        if (uint(repeaters[id].next) > 1 && uint(repeaters[id].next) > min) {
+            bytes32[] memory values = new bytes32[](uint(repeaters[id].next));
             uint next = 0;
-            for (uint i = 1; i < uint(repeaters[repeaterId].next); i++) {
-                if (repeaters[repeaterId].feeds[bytes12(i)].addr != 0) {
-                    (value, ok) = DSFeedsInterface(repeaters[repeaterId].feeds[bytes12(i)].addr).tryGet(repeaters[repeaterId].feeds[bytes12(i)].position);
+            for (uint i = 1; i < uint(repeaters[id].next); i++) {
+                if (repeaters[id].feeds[bytes12(i)].addr != 0) {
+                    if (DSFeedsInterface(repeaters[id].feeds[bytes12(i)].addr).peek(repeaters[id].feeds[bytes12(i)].position)) {
+                        value = DSFeedsInterface(repeaters[id].feeds[bytes12(i)].addr).read(repeaters[id].feeds[bytes12(i)].position);
 
-                    if(ok) {
                         if (next == 0 || value > values[next - 1]) {
                             values[next] = value;
                         } else {
@@ -33,10 +33,10 @@ contract MedianRepeater is Repeater
                 }
             }
 
-            if (next > 0 && next >= minimumValid) {
-                return (values[(next - 1) / 2], true);
+            if (next > 0 && next >= min) {
+                return values[(next - 1) / 2];
             }
-            return (0, false);
+            return 0;
         }
     }
 }

@@ -58,7 +58,7 @@ contract MedianRepeaterTest is DSTest,
         assertEq(uint(repeater.claim(1)), 2);
 
         LogClaim(2, this);
-        LogMinimumValid(2, 1);
+        LogSetMin(2, 1);
     }
 
     function test_claim_with_no_minimum() {
@@ -69,7 +69,7 @@ contract MedianRepeaterTest is DSTest,
         assertEq(uint(repeater.claim()), 2);
 
         LogClaim(2, this);
-        LogMinimumValid(2, 1);
+        LogSetMin(2, 1);
     }
 
     function test_is_owner() {
@@ -102,7 +102,7 @@ contract MedianRepeaterTest is DSTest,
         DSFeeds(assistant).set_label(id, "foo");
     }
 
-    function test_try_get() {
+    function test_read() {
         bytes12 id1 = feedbase1.claim();
         feedbase1.set(id1, 11);
         
@@ -124,10 +124,9 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(id, feedbase1, id4);
         repeater.set(id, feedbase2, id5);
 
-        var (value, ok) = repeater.tryGet(id);
+        var value = repeater.read(id);
 
         assertEq32(value, 11);
-        assert(ok);
     }
 
     function test_try_get_feed() {
@@ -136,10 +135,9 @@ contract MedianRepeaterTest is DSTest,
 
         repeater.set(id, feedbase1, id1);
 
-        var (value, ok) = repeater.tryGetFeed(id, id1);
+        var value = repeater.tryGetFeed(id, id1);
 
         assertEq32(value, 50);
-        assert(ok);
     }
 
     function test_get_feedInfo() {
@@ -173,7 +171,7 @@ contract MedianRepeaterTest is DSTest,
         assertEq(feedsQuantity, 3);
     }
 
-    function test_try_get_with_two_expired() {
+    function test_read_with_two_expired() {
         bytes12 newId = repeater.claim(3);
 
         bytes12 id1 = feedbase1.claim();
@@ -197,13 +195,12 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(newId, feedbase1, id4);
         repeater.set(newId, feedbase2, id5);
 
-        var (value, ok) = repeater.tryGet(newId);
+       var value = repeater.read(newId);
 
         assertEq32(value, 10);
-        assert(ok);
     }
 
-    function test_try_get_with_three_expired() {
+    function test_read_with_three_expired() {
         bytes12 newId = repeater.claim(3);
 
         bytes12 id1 = feedbase1.claim();
@@ -227,10 +224,9 @@ contract MedianRepeaterTest is DSTest,
         repeater.set(newId, feedbase1, id4);
         repeater.set(newId, feedbase2, id5);
 
-        var (value, ok) = repeater.tryGet(newId);
+       var value = repeater.read(newId);
 
         assertEq32(value, 0);
-        assert(!ok);
     }
 
     function test_unset() {
@@ -257,20 +253,18 @@ contract MedianRepeaterTest is DSTest,
         bytes12 feedId4 = repeater.set(newId, feedbase1, id4);
         bytes12 feedId5 = repeater.set(newId, feedbase2, id5);
 
-        var (value, ok) = repeater.tryGet(newId);
+       var value = repeater.read(newId);
 
         assertEq32(value, 11);
-        assert(ok);
 
         repeater.unset(newId, feedId1);
         repeater.unset(newId, feedId2);
 
-        (value, ok) = repeater.tryGet(newId);
+        value = repeater.read(newId);
         assertEq32(value, 16);
-        assert(ok);
 
         repeater.set(newId, feedbase2, id2);
-        (value, ok) = repeater.tryGet(newId);
+        value = repeater.read(newId);
         assertEq32(value, 10);
     }
 }
@@ -282,7 +276,7 @@ contract FakePerson {
         repeater  = repeater_;
     }
 
-    function tryGet(bytes12 id) returns (bytes32, bool) {
-        return repeater.tryGet(id);
+    function tryGet(bytes12 id) returns (bytes32) {
+        return repeater.read(id);
     }
 }

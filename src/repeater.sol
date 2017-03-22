@@ -60,7 +60,7 @@ contract Repeater is RepeaterInterface
     struct Repeater {
         address                     owner;
         bytes32                     label;
-        bytes12                     minimumValid;
+        bytes12                     min;
         bytes12                     next;
         mapping (bytes12 => Feed)   feeds;
     }
@@ -70,41 +70,41 @@ contract Repeater is RepeaterInterface
         bytes12                 position;
     }
 
-    function owner(bytes12 repeaterId) constant returns (address) {
-        return repeaters[repeaterId].owner;
+    function owner(bytes12 id) constant returns (address) {
+        return repeaters[id].owner;
     }
-    function label(bytes12 repeaterId) constant returns (bytes32) {
-        return repeaters[repeaterId].label;
+    function label(bytes12 id) constant returns (bytes32) {
+        return repeaters[id].label;
     }
-    function minimumValid(bytes12 repeaterId) constant returns (bytes12) {
-        return repeaters[repeaterId].minimumValid;
+    function min(bytes12 id) constant returns (bytes12) {
+        return repeaters[id].min;
     }
-    function feedsQuantity(bytes12 repeaterId) constant returns (bytes12) {
-        return bytes12(uint96(repeaters[repeaterId].next)-1);
+    function feedsQuantity(bytes12 id) constant returns (bytes12) {
+        return bytes12(uint96(repeaters[id].next)-1);
     }
 
     //------------------------------------------------------------------
     // Creating repeaters
     //------------------------------------------------------------------
 
-    function claim() returns (bytes12 repeaterId) {
+    function claim() returns (bytes12 id) {
         return claim(1);
     }
 
-    function claim(bytes12 minimumValid) returns (bytes12 repeaterId) {
-        repeaterId = next;
-        assert(repeaterId != 0x0);
+    function claim(bytes12 min) returns (bytes12 id) {
+        id = next;
+        assert(id != 0x0);
 
         next = bytes12(uint96(next)+1);
 
-        repeaters[repeaterId].owner = msg.sender;
-        repeaters[repeaterId].next = 0x1;
+        repeaters[id].owner = msg.sender;
+        repeaters[id].next = 0x1;
 
-        LogClaim(repeaterId, msg.sender);
+        LogClaim(id, msg.sender);
 
-        set_minimumValid(repeaterId, minimumValid);
+        set_min(id, min);
 
-        return repeaterId;
+        return id;
     }
 
     modifier repeater_auth(bytes12 id) {
@@ -116,77 +116,84 @@ contract Repeater is RepeaterInterface
     // Updating repeaters
     //------------------------------------------------------------------
 
-    function set(bytes12 repeaterId, address addr, bytes12 position)
-         repeater_auth(repeaterId)
+    function set(bytes12 id, address addr, bytes12 position)
+         repeater_auth(id)
          returns (bytes12 feedId)
     {
-        feedId = repeaters[repeaterId].next;
+        feedId = repeaters[id].next;
         assert(feedId != 0x0);
 
-        repeaters[repeaterId].next = bytes12(uint96(feedId)+1);
+        repeaters[id].next = bytes12(uint96(feedId)+1);
 
-        set(repeaterId, feedId, addr, position);
+        set(id, feedId, addr, position);
         return feedId;
     }
 
-    function set(bytes12 repeaterId, bytes12 feedId, address addr, bytes12 position)
-         repeater_auth(repeaterId)
+    function set(bytes12 id, bytes12 feedId, address addr, bytes12 position)
+         repeater_auth(id)
     {
-        repeaters[repeaterId].feeds[feedId].addr = addr;
-        repeaters[repeaterId].feeds[feedId].position = position;
+        repeaters[id].feeds[feedId].addr = addr;
+        repeaters[id].feeds[feedId].position = position;
 
-        LogSet(repeaterId, feedId, addr, position);
+        LogSet(id, feedId, addr, position);
     }
 
-    function unset(bytes12 repeaterId, bytes12 feedId)
-         repeater_auth(repeaterId)
+    function unset(bytes12 id, bytes12 feedId)
+         repeater_auth(id)
     {
-        repeaters[repeaterId].feeds[feedId].addr = address(0);
-        repeaters[repeaterId].feeds[feedId].position = 0;
+        repeaters[id].feeds[feedId].addr = address(0);
+        repeaters[id].feeds[feedId].position = 0;
 
-        LogUnset(repeaterId, feedId);
+        LogUnset(id, feedId);
     }
 
-    function set_owner(bytes12 repeaterId, address owner)
-        repeater_auth(repeaterId)
+    function set_owner(bytes12 id, address owner)
+        repeater_auth(id)
     {
-        repeaters[repeaterId].owner = owner;
-        LogSetOwner(repeaterId, owner);
+        repeaters[id].owner = owner;
+        LogSetOwner(id, owner);
     }
 
-    function set_label(bytes12 repeaterId, bytes32 label)
-        repeater_auth(repeaterId)
+    function set_label(bytes12 id, bytes32 label)
+        repeater_auth(id)
     {
-        repeaters[repeaterId].label = label;
-        LogSetLabel(repeaterId, label);
+        repeaters[id].label = label;
+        LogSetLabel(id, label);
     }
 
-    function set_minimumValid(bytes12 repeaterId, bytes12 minimumValid) 
-        repeater_auth(repeaterId)
+    function set_min(bytes12 id, bytes12 min) 
+        repeater_auth(id)
     {
-        repeaters[repeaterId].minimumValid = minimumValid;
-        LogMinimumValid(repeaterId, minimumValid);
+        repeaters[id].min = min;
+        LogSetMin(id, min);
     }
 
     //------------------------------------------------------------------
     // Reading repeaters
     //------------------------------------------------------------------
 
-    function getFeedInfo(bytes12 repeaterId, bytes12 feedId) returns (address, bytes12) {
-        return (repeaters[repeaterId].feeds[feedId].addr, repeaters[repeaterId].feeds[feedId].position);
+    function getFeedInfo(bytes12 id, bytes12 feedId) returns (address, bytes12) {
+        return (repeaters[id].feeds[feedId].addr, repeaters[id].feeds[feedId].position);
     }
 
-    function tryGetFeed(bytes12 repeaterId, bytes12 feedId) returns (bytes32, bool) {
-        return DSFeedsInterface(repeaters[repeaterId].feeds[feedId].addr).tryGet(repeaters[repeaterId].feeds[feedId].position);
+    function tryGetFeed(bytes12 id, bytes12 feedId) constant returns (bytes32) {
+        return DSFeedsInterface(repeaters[id].feeds[feedId].addr).read(repeaters[id].feeds[feedId].position);
     }
 
-    function get(bytes12 repeaterId) returns (bytes32 value) {
-        var (val, ok) = tryGet(repeaterId);
-        if(!ok) throw;
-        return val;
+    function peek(bytes12 id) constant returns (bool ok) {
+        ok = true;
+        uint min = uint(repeaters[id].min);
+
+        if (uint(repeaters[id].next) > 1 && uint(repeaters[id].next) > min) {
+            uint next = 0;
+            for (uint i = 1; i < uint(repeaters[id].next); i++) {
+                if (repeaters[id].feeds[bytes12(i)].addr != 0) {
+                    ok = DSFeedsInterface(repeaters[id].feeds[bytes12(i)].addr).peek(repeaters[id].feeds[bytes12(i)].position);
+                    if (!ok) return false;
+                }
+            }
+        }
     }
 
-    function tryGet(bytes12 repeaterId) constant returns (bytes32 value, bool ok) {
-        return (0, false);
-    }
+    function read(bytes12 id) constant returns (bytes32 value);
 }

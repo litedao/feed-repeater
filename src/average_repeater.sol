@@ -5,28 +5,28 @@ import "ds-feeds/interface.sol";
 
 contract AverageRepeater is Repeater
 {
-    function tryGet(bytes12 repeaterId) constant returns (bytes32 value, bool ok) {
-        uint minimumValid = uint(repeaters[repeaterId].minimumValid);
+    function read(bytes12 repeaterId) constant returns (bytes32 value) {
+        uint min = uint(repeaters[repeaterId].min);
 
-        if (uint(repeaters[repeaterId].next) > 1 && uint(repeaters[repeaterId].next) > minimumValid) {
+        if (uint(repeaters[repeaterId].next) > 1 && uint(repeaters[repeaterId].next) > min) {
             uint amount = 0;
             uint quantity = 0;
 
             for (uint i = 1; i < uint(repeaters[repeaterId].next); i++) {
                 if (repeaters[repeaterId].feeds[bytes12(i)].addr != 0) {
-                    (value, ok) = DSFeedsInterface(repeaters[repeaterId].feeds[bytes12(i)].addr).tryGet(repeaters[repeaterId].feeds[bytes12(i)].position);
+                    if (DSFeedsInterface(repeaters[repeaterId].feeds[bytes12(i)].addr).peek(repeaters[repeaterId].feeds[bytes12(i)].position)) {
+                        value = DSFeedsInterface(repeaters[repeaterId].feeds[bytes12(i)].addr).read(repeaters[repeaterId].feeds[bytes12(i)].position);
 
-                    if(ok) {
                         amount += uint(value);
                         quantity += 1;
                     }
                 }
             }
 
-            if (quantity > 0 && quantity >= minimumValid ) {
-                return (bytes32(amount / quantity), true);
+            if (quantity > 0 && quantity >= min ) {
+                return bytes32(amount / quantity);
             }
-            return (0, false);
+            return 0;
         }
     }
 }
